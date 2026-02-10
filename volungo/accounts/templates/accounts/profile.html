@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Профіль волонтера</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0f1a;
+      --surface:   #111827;
+      --card:      #161d2e;
+      --border:    #1f2d45;
+      --accent:    #00e5a0;
+      --accent2:   #00aaff;
+      --gold:      #f5c842;
+      --text:      #e2eaf7;
+      --muted:     #637494;
+      --danger:    #ff4f6a;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 20% -10%, rgba(0,229,160,.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 85% 10%,  rgba(0,170,255,.06) 0%, transparent 70%);
+    }
+
+    h1,h2,h3,h4 { font-family: 'Oxanium', sans-serif; letter-spacing: .04em; }
+
+    /* ── Layout ─────────────────────────────── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ── Hero card ──────────────────────────── */
+    .hero {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 32px;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 40px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(0,229,160,.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* avatar */
+    .avatar-wrap { position: relative; }
+    .avatar {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(135deg,#1a3a2a,#0a1a2f);
+      box-shadow: 0 0 24px rgba(0,229,160,.35);
+    }
+    .avatar-placeholder {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      background: linear-gradient(135deg,#1a3a2a,#0a1a2f);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 42px;
+      box-shadow: 0 0 24px rgba(0,229,160,.35);
+    }
+    .level-badge {
+      position: absolute; bottom: 0; right: -6px;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Oxanium', sans-serif;
+      font-size: 11px; font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* bio */
+    .bio { min-width: 0; }
+    .bio-name {
+      font-size: 26px; font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .bio-role {
+      font-size: 13px; color: var(--accent); font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* XP bar */
+    .xp-label {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--muted); margin-bottom: 6px;
+    }
+    .xp-label span:last-child { color: var(--accent); font-weight: 700; }
+    .xp-track {
+      height: 8px; background: var(--border); border-radius: 99px;
+      overflow: hidden; width: 100%; max-width: 340px;
+    }
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      width: 68%;
+      box-shadow: 0 0 10px rgba(0,229,160,.5);
+      animation: xpGrow 1.2s cubic-bezier(.4,0,.2,1) both;
+    }
+    @keyframes xpGrow { from { width: 0; } }
+
+    .stats-row {
+      display: flex; gap: 28px; margin-top: 18px;
+    }
+    .stat { text-align: center; }
+    .stat-val { font-family: 'Oxanium', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
+    .stat-key { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+    /* add friend button */
+    .btn-friend {
+      align-self: flex-start;
+      display: flex; align-items: center; gap: 8px;
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      font-family: 'Oxanium', sans-serif;
+      font-size: 13px; font-weight: 700;
+      padding: 10px 22px; border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s, box-shadow .2s, transform .15s;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    .btn-friend:hover {
+      background: rgba(0,229,160,.1);
+      box-shadow: 0 0 18px rgba(0,229,160,.3);
+      transform: translateY(-2px);
+    }
+    .btn-friend svg { flex-shrink: 0; }
+
+    /* ── Section titles ─────────────────────── */
+    .section { margin-bottom: 36px; }
+    .section-title {
+      font-size: 13px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Two-column grid ────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+    @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Achievements ───────────────────────── */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .achievement-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; text-align: center;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      cursor: default;
+    }
+    .achievement-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,229,160,.12);
+    }
+    .ach-icon { font-size: 32px; }
+    .ach-name {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 13px; font-weight: 700;
+      color: var(--text);
+    }
+    .ach-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .ach-locked { opacity: .35; filter: grayscale(1); }
+
+    /* ── Badges ─────────────────────────────── */
+    .badges-row {
+      display: flex; flex-wrap: wrap; gap: 12px;
+    }
+    .badge {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 7px 16px 7px 10px;
+      font-size: 13px; font-weight: 600;
+      transition: border-color .2s, transform .2s;
+      cursor: default;
+    }
+    .badge:hover { border-color: var(--accent2); transform: scale(1.04); }
+    .badge-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .badge.green  .badge-dot { background: rgba(0,229,160,.15); }
+    .badge.blue   .badge-dot { background: rgba(0,170,255,.15); }
+    .badge.gold   .badge-dot { background: rgba(245,200,66,.15); }
+    .badge.purple .badge-dot { background: rgba(167,139,250,.15); }
+
+    /* ── Event list ─────────────────────────── */
+    .event-list { display: flex; flex-direction: column; gap: 16px; }
+    .event-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 18px;
+      transition: border-color .2s, box-shadow .2s;
+      animation: fadeUp .5s both;
+    }
+    .event-card:nth-child(2) { animation-delay: .1s; }
+    .event-card:nth-child(3) { animation-delay: .2s; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .event-card:hover {
+      border-color: rgba(0,170,255,.4);
+      box-shadow: 0 4px 20px rgba(0,170,255,.08);
+    }
+
+    .event-date {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+    .event-date-day {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 22px; font-weight: 800;
+      color: var(--accent2); line-height: 1;
+    }
+    .event-date-month {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); margin-top: 2px;
+    }
+
+    .event-body { min-width: 0; }
+    .event-title {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 16px; font-weight: 700;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .event-org {
+      font-size: 12px; color: var(--muted); margin-bottom: 12px;
+    }
+    .event-org span { color: var(--accent2); font-weight: 600; }
+
+    .review-box {
+      background: var(--surface);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      font-size: 13px; color: var(--text);
+      line-height: 1.55;
+      font-style: italic;
+    }
+    .review-author {
+      margin-top: 8px;
+      font-size: 12px; color: var(--muted);
+      font-style: normal;
+    }
+    .review-author strong { color: var(--accent); }
+
+    .stars { color: var(--gold); font-size: 13px; margin-bottom: 6px; }
+
+    /* ── Responsive tweaks ──────────────────── */
+    @media (max-width: 680px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .avatar-wrap { margin: 0 auto; }
+      .stats-row { justify-content: center; }
+      .xp-track { max-width: 100%; }
+      .btn-friend { align-self: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── HERO ─────────────────────────────────── -->
+  <div class="hero">
+    <div class="avatar-wrap">
+      <div class="avatar-placeholder">🧑</div>
+      <span class="level-badge">LVL 12</span>
+    </div>
+
+    <div class="bio">
+      <div class="bio-name">Олексій Мороз</div>
+      <div class="bio-role">Досвідчений волонтер · Київ</div>
+
+      <div class="xp-label">
+        <span>XP до наступного рівня</span>
+        <span>3 400 / 5 000</span>
+      </div>
+      <div class="xp-track"><div class="xp-fill"></div></div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-val">47</div>
+          <div class="stat-key">подій</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">312</div>
+          <div class="stat-key">годин</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">18</div>
+          <div class="stat-key">друзів</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">4.9 ★</div>
+          <div class="stat-key">рейтинг</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-friend">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+      </svg>
+      Додати в друзі
+    </button>
+  </div>
+
+  <!-- ── ACHIEVEMENTS + BADGES ────────────────── -->
+  <div class="two-col">
+
+    <div class="section">
+      <div class="section-title">Досягнення</div>
+      <div class="achievements-grid">
+        <div class="achievement-card">
+          <div class="ach-icon">🌱</div>
+          <div class="ach-name">Перший крок</div>
+          <div class="ach-desc">Взяв участь у першому заході</div>
+        </div>
+        <div class="achievement-card">
+          <div class="ach-icon">🔥</div>
+          <div class="ach-name">На хвилі</div>
+          <div class="ach-desc">10 заходів поспіль</div>
+        </div>
+        <div class="achievement-card">
+          <div class="ach-icon">🏆</div>
+          <div class="ach-name">Ветеран</div>
+          <div class="ach-desc">50+ годин волонтерства</div>
+        </div>
+        <div class="achievement-card ach-locked">
+          <div class="ach-icon">💎</div>
+          <div class="ach-name">Легенда</div>
+          <div class="ach-desc">500+ годин · ще не відкрито</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Бейджі</div>
+      <div class="badges-row">
+        <div class="badge green">
+          <div class="badge-dot">🌿</div>Еко
+        </div>
+        <div class="badge blue">
+          <div class="badge-dot">🏥</div>Медична допомога
+        </div>
+        <div class="badge gold">
+          <div class="badge-dot">⭐</div>Топ волонтер
+        </div>
+        <div class="badge purple">
+          <div class="badge-dot">📚</div>Освіта
+        </div>
+        <div class="badge green">
+          <div class="badge-dot">🐾</div>Тваринки
+        </div>
+        <div class="badge blue">
+          <div class="badge-dot">🏗️</div>Відбудова
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── EVENTS ────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">Останні волонтерські події</div>
+    <div class="event-list">
+
+      <div class="event-card">
+        <div class="event-date">
+          <div class="event-date-day">14</div>
+          <div class="event-date-month">Трав</div>
+        </div>
+        <div class="event-body">
+          <div class="event-title">Прибирання Гідропарку</div>
+          <div class="event-org">Організатор: <span>Green Kyiv</span></div>
+          <div class="stars">★★★★★</div>
+          <div class="review-box">
+            «Олексій — один із найвідповідальніших волонтерів, яких ми мали. Прийшов вчасно, працював до кінця, ще й мотивував інших. Завжди раді бачити його на наших заходах!»
+            <div class="review-author">— <strong>Марія Ткаченко</strong>, координатор Green Kyiv</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-date">
+          <div class="event-date-day">02</div>
+          <div class="event-date-month">Трав</div>
+        </div>
+        <div class="event-body">
+          <div class="event-title">Збір гуманітарної допомоги</div>
+          <div class="event-org">Організатор: <span>Фонд «Разом»</span></div>
+          <div class="stars">★★★★★</div>
+          <div class="review-box">
+            «Дуже вдячні Олексію за допомогу з сортуванням та пакуванням. Справжній командний гравець, швидко орієнтується і береться за найскладніші задачі.»
+            <div class="review-author">— <strong>Іван Білий</strong>, менеджер Фонду «Разом»</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-date">
+          <div class="event-date-day">19</div>
+          <div class="event-date-month">Кві</div>
+        </div>
+        <div class="event-body">
+          <div class="event-title">Майстер-клас з програмування для дітей</div>
+          <div class="event-org">Організатор: <span>Code4Kids UA</span></div>
+          <div class="stars">★★★★☆</div>
+          <div class="review-box">
+            «Олексій провів чудовий урок, діти були в захваті. Добре пояснює складні речі простою мовою. Рекомендуємо як ментора для наступних сесій.»
+            <div class="review-author">— <strong>Оксана Ліщук</strong>, засновниця Code4Kids UA</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
