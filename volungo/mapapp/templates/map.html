@@ -23,6 +23,42 @@
         color: #1b4d1b; /* темно-зелений */
     }
 
+    #geolocation-popup {
+        display: block;
+        position: fixed;
+        height: 200 px;
+        width: 400px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f5f5f5;
+        border: 2px solid #4caf50;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 1000;
+        text-align: center;
+    }
+    #geolocation-popup .buttons {
+    margin-top: 15px;
+    }
+
+    #geolocation-popup button {
+    padding: 10px 20px;
+    margin: 0 10px; /* відстань між кнопками */
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #4caf50;
+    color: white;
+    transition: background-color 0.2s;
+    }
+
+    #geolocation-popup button:hover {
+    background-color: #45a049;
+    }
+
     /* Кнопка профілю */
     #profile-button {
         position: absolute;
@@ -138,22 +174,7 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    #location-button {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-    #location-button:hover {
-        background-color: #66bb6a;
-    }
+
     </style>
 </head>
 
@@ -163,6 +184,14 @@
 
 <button id="profile-button">Ваш профіль</button>
 
+
+<div id="geolocation-popup">
+    <p>Надати свої координати?</p>
+    <div class="geolocation-wrapper"></div>
+        <button id="yes-button">Так</button>
+        <button id="no-button">Ні</button>
+    </div>
+</div>
 
 
 <div class="actions-wrapper">
@@ -185,16 +214,28 @@
 
 <button id="search-button">Знайти найближчі</button>
 
-<button id="location-button">Надати мої координати</button>
 <div id="map"></div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
   const map = L.map('map').setView([49.84, 24.03], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+}).addTo(map);
 
-  // Фільтри toggle
+  const popup = document.getElementById("geolocation-popup");
+  const popupbuttons = popup.querySelectorAll("button");
+  let visibility = true
+
+  popupbuttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        popup.style.display = "none";
+    });
+});
+
   const button = document.getElementById('filters-button');
   const filters = document.getElementById('filters');
   const before_clicking = "> Фільтрувати";
@@ -212,4 +253,29 @@
           filters.style.display = 'none';
       }
     });
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      fetch("/save-location/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({lat: lat, lon: lon})
+    });
+
+      console.log("Координати користувача:", lat, lon);
+
+      // Додаємо маркер на карту
+      const userMarker = L.marker([lat, lon]).addTo(map)
+          .bindPopup("Ви тут!")
+          .openPopup();
+
+      // За бажанням можна пересунути карту на місцезнаходження користувача
+      map.setView([lat, lon], 13);
+  });
+
+
 </script>
