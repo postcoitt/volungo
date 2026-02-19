@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 
+
 def my_button_action(request):
     result = {"message": 'Кнопка натиснулась і працює! Слава Богу!'}
     return JsonResponse(result)

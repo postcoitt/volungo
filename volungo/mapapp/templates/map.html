@@ -1,238 +1,216 @@
 <head>
-    <title>Our map</title>
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet"
-   href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <title>Volungo Map</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
-
-
-   <style>
+    <style>
     body {
-        background-color: darkcyan;
+        background-color: #e6f2e6; /* світло-зелений фон */
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
+    /* Назва сайту */
     #our-name {
         position: absolute;
-        top: 35px;
+        top: 30px;
         left: 40px;
         font-style: italic;
         font-size: 150px;
         font-family: "Copperplate", fantasy;
         text-decoration: underline;
-        color: white
-
+        color: #1b4d1b; /* темно-зелений */
     }
 
+    /* Кнопка профілю */
     #profile-button {
         position: absolute;
-        right: 12.5px;
-        top: 12.5px;
-        height: 120px;
-        width: 120px;
+        right: 20px;
+        top: 20px;
+        height: 100px;
+        width: 100px;
         border-radius: 50%;
-        color: black;
-        font-size: 20px;
-        background-color: lightgray;
-        padding: 0px 0px;
+        color: #fff;
+        font-size: 18px;
+        background-color: #4caf50; /* яскраво-зелений */
+        border: 3px solid #388e3c;
         cursor: pointer;
-        border: 4px solid darkkhaki
+        transition: all 0.2s ease;
     }
     #profile-button:hover {
-        background-color: white;
-        border-color: khaki;
+        background-color: #66bb6a;
+        border-color: #2e7d32;
     }
 
-
-    #filters-button {
-        position: absolute;
-        right: 12.5px;
-        top: 190px;
-        height: 40px;
-        font-size: 14.5px;
-        width: 140px;
-        color: black;
-        background-color: darkkhaki;
-        padding: 0px 0px;
-        cursor: pointer;
-    }
-    #filters-button:hover {
-        background-color: khaki;
-    }
-
-    .filters-wrapper {
+    .actions-wrapper {
     position: absolute;
     right: 12.5px;
     top: 190px;
     }
 
-    #filters {
-    position: absolute;
-    top: 230px;
-    width: 140px;
-    height: 95px;
-    right: 12.5px;
-    background: white;
-    padding: 10px;
-    border: 1px solid gray;
-    border-radius: 8px;
-    display: none;
-    z-index: 1000;
-    }
-
-    #filter1 {
-    background-color: darkkhaki;
-    color: black;
-    cursor: pointer;
-    width: 140px;
-    height: 30px;
-    }
-
-    #filter2 {
-    background-color: darkkhaki;
-    color: black;
-    cursor: pointer;
-    width: 140px;
-    height: 30px;
-    }
-
-    #filter3 {
-    background-color: darkkhaki;
-    color: black;
-    cursor: pointer;
-    width: 140px;
-    height: 30px;
-    }
-
-
-    #donation-button {
-        position: absolute;
-        right: 170px;
-        top: 190px;
-        font-size: 14.5px;
+    /* Основні дії */
+    button.action-btn {
         height: 40px;
         width: 140px;
-        color: black;
-        background-color: darkkhaki;
-        padding: 0px 0px;
+        font-size: 15px;
+        color: #fff;
+        background-color: #66bb6a;
+        border: none;
+        border-radius: 8px;
         cursor: pointer;
+        transition: all 0.2s ease;
     }
-    #donation-button:hover {
-        background-color: khaki;
+    button.action-btn:hover {
+        background-color: #81c784;
     }
 
+    #actions {
+    display: flex;
+    gap: 12px;
+    }
 
-    #create-button {
-        position: absolute;
-        right: 332.5px;
-        top: 190px;
-        font-size: 14.5px;
-        height: 40px;
-        width: 140px;
-        color: black;
-        background-color: darkkhaki;
-        padding: 0px 0px;
-        cursor: pointer;
-    }
-    #create-button:hover {
-        background-color: khaki;
-    }
+    #create-button { }
+    #donation-button { }
+    #filters-button { right: 12.5px; top: 190px; background-color: #81c784; color: #000; }
+    #filters-button:hover { background-color: #a5d6a7; }
 
     #search-button {
         position: absolute;
         right: 12.5px;
         top: 245px;
-        font-size: 17.5px;
+        font-size: 16px;
         height: 40px;
         width: 190px;
-        color: black;
-        background-color: white;
+        color: #000;
+        background-color: #c8e6c9;
+        border-radius: 8px;
+        border: 1px solid #81c784;
         cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    #search-button:hover {
+        background-color: #a5d6a7;
     }
 
+    /* Контейнер для фільтрів */
+    .filters-container {
+    position: relative;
+    display: inline-block;
+    }
+
+    #filters {
+    position: absolute;
+    top: 45px;   /* під кнопкою */
+    right: 0;
+    width: 120px;
+    background: #e8f5e9;
+    padding: 10px;
+    border: 1px solid #81c784;
+    border-radius: 10px;
+    display: none;
+    z-index: 1000;
+    }
+
+    #filters button {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+        height: 35px;
+        font-size: 14px;
+        background-color: #66bb6a;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    #filters button:hover {
+        background-color: #81c784;
+    }
+
+    /* Карта */
     #map {
-      height: 700px;
-      width: 100%;
-      margin-top: 300px;
+        height: 700px;
+        width: 100%;
+        margin-top: 320px; /* відступ від верху для кнопок та заголовку */
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-
-    /* Стилі для тексту під картою */
-  </style>
+    #location-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #location-button:hover {
+        background-color: #66bb6a;
+    }
+    </style>
 </head>
 
 <body>
 
+<h1 id="our-name">Volungo</h1>
 
-<h1 id="our-name">Volungo<h1></h1>
-
-<button id="profile-button">Ваш профіль</button>
-
-<script>
-document.getElementById('profile-button').addEventListener('click', function() {
-    fetch('/my-button-action/')
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);  // показуємо результат
-        });
-});
-</script>
+<a href="{% url 'profile' %}">
+    <button id="profile-button">Ваш профіль</button>
+</a>
 
 
-<button id="donation-button">$ Зробити донат</button>
-<button id="create-button">+ Створити подію</button>
-<button id="search-button">Знайти найближчі</button>
+<div class="actions-wrapper">
+    <div id="actions">
+        <button id="create-button" class="action-btn">+ Створити подію</button>
+        <button id="donation-button" class="action-btn">$ Зробити донат</button>
 
+        <div class="filters-container">
+            <button id="filters-button" class="action-btn">> Фільтрувати</button>
 
-<div id="map"></div>
+            <div id="filters">
+                <button id="filter1">Фільтр 1</button>
+                <button id="filter2">Фільтр 2</button>
+                <button id="filter3">Фільтр 3</button>
+            </div>
+        </div>
 
-
-<div class="filters-wrapper"></div>
-    <button id="filters-button">⌄ Фільтрувати</button>
-
-    <div id="filters" style="display: none;">
-        <button id="filter1">Фільтр 1</button>
-        <button id="filter2">Фільтр 2</button>
-        <button id="filter3">Фільтр 3</button>
     </div>
 </div>
 
-<script>
+<button id="search-button">Знайти найближчі</button>
 
-const button = document.getElementById('filters-button');
-const filters = document.getElementById('filters')
-
-const before_clicking = "⌄ Фільтрувати";
-const after_clicking = "> Фільтрувати";
-
-
-let clicked = false;
-
-
-button.addEventListener('click', function() {
-    // чергуємо текст
-    if (!clicked) {
-        button.innerText = after_clicking;
-        clicked = true;
-        filters.style.display = 'block'
-    }
-    else {
-        button.innerText = before_clicking;
-        clicked = false;
-        filters.style.display = 'none'
-    }
-});
-</script>
-
+<button id="location-button">Надати мої координати</button>
+<div id="map"></div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 <script>
   const map = L.map('map').setView([49.84, 24.03], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-    .addTo(map);
+  // Фільтри toggle
+  const button = document.getElementById('filters-button');
+  const filters = document.getElementById('filters');
+  const before_clicking = "> Фільтрувати";
+  const after_clicking = "⌄ Фільтрувати";
+  let clicked = false;
+
+  button.addEventListener('click', function() {
+      if (!clicked) {
+          button.innerText = after_clicking;
+          clicked = true;
+          filters.style.display = 'block';
+      } else {
+          button.innerText = before_clicking;
+          clicked = false;
+          filters.style.display = 'none';
+      }
+    });
 </script>
-
-
-</body>
