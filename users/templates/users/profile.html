@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Профіль {{ full_name }}</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f8fbff; color: #000; }
+        .header { background: #3b469b; color: white; padding: 25px 80px; font-size: 32px; font-weight: bold; }
+
+        .container { display: flex; padding: 50px 80px; gap: 60px; }
+
+        /* Ліва частина */
+        .sidebar { width: 220px; text-align: center; }
+        .avatar-border { width: 180px; height: 180px; border-radius: 50%; border: 6px solid #f1d35a; overflow: hidden; margin: 0 auto; }
+        .avatar-border img { width: 100%; height: 100%; object-fit: cover; }
+
+        .level-tag { background: #f1d35a; border-radius: 20px; padding: 5px 20px; display: inline-block; margin-top: 15px; font-weight: bold; }
+        .xp-info { font-size: 14px; margin: 10px 0 20px; color: #444; }
+
+        .skill-tags div { border-radius: 15px; padding: 6px; color: white; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
+        .eco { background: #2d5a27; } .med { background: #a64d79; } .top { background: #c2b35a; } .edu { background: #9c2727; }
+
+        .stats { text-align: left; margin-top: 30px; font-size: 15px; }
+        .stats p { margin: 12px 0; display: flex; align-items: center; gap: 10px; }
+
+        /* Центр */
+        .content { flex: 1; }
+        .user-header h2 { font-style: italic; font-weight: 800; margin-bottom: 0; }
+        .user-header h1 { font-size: 40px; margin-top: 0; font-weight: 500; }
+
+        /* КНОПКИ */
+        .actions { display: flex; gap: 15px; margin: 25px 0; }
+        .btn { border-radius: 25px; padding: 10px 25px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .btn-blue { background: #2a3a8a; color: white; border: none; }
+        .btn-outline { background: white; border: 2px solid #2a3a8a; color: #2a3a8a; }
+        .btn:active { transform: scale(0.96); }
+
+        .events-title { font-style: italic; font-size: 28px; margin-top: 40px; }
+        .event-item { margin-top: 20px; display: flex; gap: 15px; }
+        .event-details strong { font-size: 20px; }
+        .stars { color: #f1d35a; font-size: 20px; margin: 5px 0; }
+        .quote { font-style: italic; color: #555; margin: 10px 0; max-width: 400px; }
+        .author { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .author img { width: 35px; border-radius: 50%; }
+
+        /* Досягнення */
+        .achievements { width: 350px; }
+        .achievements h2 { font-size: 32px; margin-bottom: 25px; }
+        .ach-item { border-radius: 40px; padding: 12px 25px; color: white; margin-bottom: 15px; display: flex; align-items: center; gap: 12px; font-weight: bold; }
+        .first { background: #2d5a27; } .wave { background: #a64d79; } .vet { background: #c2b35a; }
+        .ach-desc { font-size: 12px; color: #444; margin: -10px 0 15px 25px; }
+    </style>
+</head>
+<body>
+
+<div class="header">Профіль</div>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="avatar-border">
+            <img src="{{ avatar_url }}" alt="Аватар">
+        </div>
+        <div class="level-tag">Рівень: {{ level }}</div>
+        <div class="xp-info">XP: {{ xp }}</div>
+
+        <div class="skill-tags">
+            <div class="eco">🌿 еко</div>
+            <div class="med">🏥 медична допомога</div>
+            <div class="top">✨ топ волонтер</div>
+            <div class="edu">📚 освіта</div>
+        </div>
+
+        <div class="stats">
+            <p>📅 Події: 47</p>
+            <p>🕒 Години: 312</p>
+            <p>👤 Друзі: 18</p>
+            <p>⭐ Рейтинг: 4.7</p>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="user-header">
+            <h2>Ім'я користувача:</h2>
+            <h1>{{ full_name }}</h1>
+            <p><strong>Вік:</strong> {{ age }} років</p>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-blue">+ Додати до друзів</button>
+            <button class="btn btn-outline">Додати відгук</button>
+        </div>
+
+        <div class="events-title">Останні події:</div>
+        <div class="event-item">
+            <span style="font-size: 24px;">🗓</span>
+            <div class="event-details">
+                <strong>прибирання гідропарку</strong><br>
+                <span>14 травня - Організатор: Green Kyiv</span>
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p class="quote">"Олексій - один із найвідповідальніших волонтерів."</p>
+                <div class="author">
+                    <img src="{{ org_logo }}" alt="Лого">
+                    <span>-Марія Ткаченко, Green Kyiv</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="achievements">
+        <h2>Досягнення:</h2>
+        <div class="ach-item first">🌿 перший крок</div>
+        <p class="ach-desc">Взяв участь у першому заході</p>
+
+        <div class="ach-item wave">🔥 на хвилі</div>
+        <p class="ach-desc">10 заходів поспіль</p>
+
+        <div class="ach-item vet">🏆 ветеран</div>
+        <p class="ach-desc">50+ годин волонтерства</p>
+    </div>
+</div>
+
+</body>
+</html>
