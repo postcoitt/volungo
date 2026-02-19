@@ -1,0 +1,570 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Volungo – Створити подію</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:  #1a3d2b;
+      --moss:    #2d6a4f;
+      --leaf:    #52b788;
+      --mint:    #b7e4c7;
+      --cream:   #f4f1eb;
+      --bark:    #3d2b1f;
+      --muted:   #7a7468;
+      --border:  #d4ccbe;
+      --error:   #c0392b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--forest);
+      min-height: 100vh;
+    }
+
+    /* ── topbar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--forest);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .wordmark {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 1.6rem;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+    .wordmark span { color: var(--leaf); }
+
+    .topbar-right { display: flex; align-items: center; gap: 1rem; }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--mint);
+      text-decoration: none;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid rgba(183,228,199,0.3);
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.08); }
+
+    .btn-profile {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--leaf);
+      border: 2px solid var(--mint);
+      color: var(--forest);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-profile:hover { background: var(--mint); }
+
+    /* ── layout ── */
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── page title ── */
+    .page-title-block {
+      grid-column: 1 / -1;
+      padding-bottom: 1.5rem;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .page-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--leaf);
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 2.2rem;
+      color: var(--forest);
+      letter-spacing: -0.02em;
+    }
+
+    /* ── form panel ── */
+    .form-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--bark);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--forest);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--leaf);
+      box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
+    }
+
+    textarea { resize: vertical; min-height: 110px; line-height: 1.55; }
+
+    /* ── category chips ── */
+    .categories-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.2rem;
+    }
+
+    .cat-chip input[type="checkbox"] { display: none; }
+
+    .cat-chip label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--muted);
+      cursor: pointer;
+      background: #fff;
+      transition: all 0.18s;
+      user-select: none;
+    }
+
+    .cat-chip input:checked + label {
+      background: var(--moss);
+      border-color: var(--moss);
+      color: #fff;
+    }
+
+    .cat-chip label:hover { border-color: var(--leaf); color: var(--forest); }
+    .cat-chip input:checked + label:hover { background: var(--forest); }
+
+    /* ── map panel ── */
+    .map-panel { display: flex; flex-direction: column; gap: 1rem; }
+
+    .map-container {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    #location-map { height: 340px; width: 100%; }
+
+    .map-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .coords-display {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-size: 0.82rem;
+      color: var(--forest);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .coords-display .coords-value {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      color: var(--moss);
+    }
+
+    .coords-display.empty .coords-value { color: var(--muted); font-style: normal; font-family: 'DM Sans', sans-serif; }
+
+    .btn-geolocate {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      border: 1.5px solid var(--leaf);
+      border-radius: 8px;
+      color: var(--moss);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .btn-geolocate:hover { background: var(--moss); color: #fff; border-color: var(--moss); }
+
+    /* pin marker pulse */
+    .pulse-marker {
+      width: 16px; height: 16px;
+      background: var(--moss);
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 4px rgba(45,106,79,0.3);
+    }
+
+    /* ── submit row ── */
+    .submit-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding-top: 1.5rem;
+      border-top: 1.5px solid var(--border);
+    }
+
+    .btn-cancel {
+      padding: 0.8rem 1.8rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { border-color: var(--bark); color: var(--bark); }
+
+    .btn-submit {
+      padding: 0.85rem 2.4rem;
+      background: var(--moss);
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit:hover { background: var(--forest); transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* error messages */
+    .errorlist { list-style: none; }
+    .errorlist li { font-size: 0.78rem; color: var(--error); margin-top: 0.3rem; }
+
+    /* no-location warning */
+    #no-location-warning {
+      display: none;
+      font-size: 0.78rem;
+      color: var(--error);
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 768px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+      .submit-row { flex-direction: column-reverse; }
+      .btn-cancel, .btn-submit { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<nav class="topbar">
+  <a class="wordmark" href="{% url 'map' %}">Volun<span>go</span></a>
+  <div class="topbar-right">
+    <a class="btn-back" href="{% url 'map' %}">← Повернутись до карти</a>
+    <a class="btn-profile" href="{% url 'profile' %}" title="Ваш профіль">
+      {{ request.user.username|first|upper }}
+    </a>
+  </div>
+</nav>
+
+<!-- ── Main form ── -->
+<div class="page-wrap">
+
+  <div class="page-title-block">
+    <div class="page-eyebrow">Новa подія</div>
+    <h1 class="page-title">Створити волонтерську подію</h1>
+  </div>
+
+  <form method="POST" action="{% url 'create_event' %}" id="event-form" style="display: contents;">
+    {% csrf_token %}
+
+    <!-- hidden lat/lng fields populated by map -->
+    <input type="hidden" name="latitude"  id="lat-input">
+    <input type="hidden" name="longitude" id="lng-input">
+
+    <!-- ── Left column: form fields ── -->
+    <div class="form-panel">
+
+      <div>
+        <div class="section-label">Основна інформація</div>
+
+        <div class="field-group" style="margin-bottom:1rem;">
+          <label for="id_name">Назва події</label>
+          <input type="text" id="id_name" name="name"
+                 placeholder="Наприклад: Плетіння сіток у Личакові"
+                 value="{{ form.name.value|default:'' }}">
+          {{ form.name.errors }}
+        </div>
+
+        <div class="field-group">
+          <label for="id_description">Опис</label>
+          <textarea id="id_description" name="description"
+                    placeholder="Розкажіть деталі: що будемо робити, що треба взяти з собою...">{{ form.description.value|default:'' }}</textarea>
+          {{ form.description.errors }}
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Час та учасники</div>
+
+        <div class="field-row" style="margin-bottom:1rem;">
+          <div class="field-group">
+            <label for="id_datetime">Дата та час</label>
+            <input type="datetime-local" id="id_datetime" name="datetime"
+                   value="{{ form.datetime.value|default:'' }}">
+            {{ form.datetime.errors }}
+          </div>
+
+          <div class="field-group">
+            <label for="id_duration">Тривалість (год.)</label>
+            <input type="number" id="id_duration" name="duration"
+                   min="0.5" max="24" step="0.5" placeholder="2"
+                   value="{{ form.duration.value|default:'' }}">
+            {{ form.duration.errors }}
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="id_max_volunteers">Макс. кількість волонтерів</label>
+          <input type="number" id="id_max_volunteers" name="max_volunteers"
+                 min="1" placeholder="20"
+                 value="{{ form.max_volunteers.value|default:'' }}">
+          {{ form.max_volunteers.errors }}
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Категорії</div>
+        <div class="categories-grid">
+
+          {% for value, display in form.categories.field.choices %}
+          <div class="cat-chip">
+            <input type="checkbox" id="cat_{{ value }}" name="categories" value="{{ value }}"
+              {% if value in form.categories.value %}checked{% endif %}>
+            <label for="cat_{{ value }}">{{ display }}</label>
+          </div>
+          {% endfor %}
+
+        </div>
+        {{ form.categories.errors }}
+      </div>
+
+    </div>
+
+    <!-- ── Right column: map ── -->
+    <div class="map-panel">
+
+      <div class="section-label">Місце проведення</div>
+
+      <button type="button" class="btn-geolocate" id="geolocate-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+        Використати моє поточне місцезнаходження
+      </button>
+
+      <div class="map-container">
+        <div id="location-map"></div>
+      </div>
+
+      <p class="map-hint">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Клацніть на карті, щоб вибрати місце вручну
+      </p>
+
+      <div class="coords-display empty" id="coords-display">
+        <span>Координати</span>
+        <span class="coords-value" id="coords-text">Ще не вибрано</span>
+      </div>
+
+      <p id="no-location-warning">⚠ Будь ласка, вкажіть місце на карті або дозвольте геолокацію</p>
+
+    </div>
+
+    <!-- ── Submit row ── -->
+    <div class="submit-row">
+      <a class="btn-cancel" href="{% url 'map' %}">Скасувати</a>
+      <button type="button" class="btn-submit" id="submit-btn">
+        Опублікувати подію
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // ── map setup ──
+  const map = L.map('location-map').setView([49.84, 24.03], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  let marker = null;
+
+  const pulseIcon = L.divIcon({
+    className: '',
+    html: '<div class="pulse-marker"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+  });
+
+  function placeMarker(lat, lng) {
+    if (marker) marker.remove();
+    marker = L.marker([lat, lng], { icon: pulseIcon }).addTo(map);
+    map.panTo([lat, lng]);
+
+    document.getElementById('lat-input').value  = lat.toFixed(6);
+    document.getElementById('lng-input').value  = lng.toFixed(6);
+
+    const display = document.getElementById('coords-display');
+    display.classList.remove('empty');
+    document.getElementById('coords-text').textContent =
+      `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+    document.getElementById('no-location-warning').style.display = 'none';
+  }
+
+  // click on map to place pin
+  map.on('click', function(e) {
+    placeMarker(e.latlng.lat, e.latlng.lng);
+  });
+
+  // geolocation button
+  document.getElementById('geolocate-btn').addEventListener('click', function() {
+    if (!navigator.geolocation) {
+      alert('Ваш браузер не підтримує геолокацію.');
+      return;
+    }
+    this.textContent = 'Визначаємо місцезнаходження…';
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        placeMarker(pos.coords.latitude, pos.coords.longitude);
+        this.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Місцезнаходження вибрано ✓`;
+      },
+      () => {
+        alert('Не вдалося визначити місцезнаходження. Будь ласка, виберіть точку на карті вручну.');
+        this.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Використати моє поточне місцезнаходження`;
+      }
+    );
+  });
+
+  // submit — validate location before submitting
+  document.getElementById('submit-btn').addEventListener('click', function() {
+    const lat = document.getElementById('lat-input').value;
+    const lng = document.getElementById('lng-input').value;
+
+    if (!lat || !lng) {
+      document.getElementById('no-location-warning').style.display = 'block';
+      document.getElementById('location-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    document.getElementById('event-form').submit();
+  });
+</script>
+</body>
+</html>
