@@ -13,3 +13,6 @@ def filters_button_action(request):
         {"filter3": "filter", "text": "Button"}
                ]
     return JsonResponse({"buttfiltersons": filters})
+
+def interactive_map(request):
+    return render(request, 'map.html')
