@@ -194,6 +194,27 @@
 <script>
   const map = L.map('map').setView([49.84, 24.03], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  const events = [
+  {% for event in events %}
+  {
+    lat: {{ event.latitude }},
+    lng: {{ event.longitude }},
+    name: "{{ event.name }}",
+    description: "{{ event.description|truncatechars:100 }}",
+    duration: "{{ event.duration }}",
+    max_volunteers: "{{ event.max_volunteers }}",
+  },
+  {% endfor %}
+];
+
+events.forEach(function(event) {
+  const marker = L.marker([event.lat, event.lng]).addTo(map);
+  marker.bindPopup(`
+    <strong>${event.name}</strong><br>
+    ${event.description}<br>
+    <em>Тривалість: ${event.duration} год. | Макс. волонтерів: ${event.max_volunteers}</em>
+  `);
+});
 
   // Фільтри toggle
   const button = document.getElementById('filters-button');

@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import EventForm
+from .models import Event
 
 def my_button_action(request):
     result = {"message": 'Кнопка натиснулась і працює! Слава Богу!'}
@@ -17,7 +18,8 @@ def filters_button_action(request):
     return JsonResponse({"buttfiltersons": filters})
 
 def interactive_map(request):
-    return render(request, 'mapapp/map.html', {})
+    events = Event.objects.all()
+    return render(request, 'mapapp/map.html', {'events': events})
 
 @login_required
 def create_event(request):
