@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 
-
 def my_button_action(request):
     result = {"message": 'Кнопка натиснулась і працює! Слава Богу!'}
     return JsonResponse(result)
@@ -17,3 +16,7 @@ def filters_button_action(request):
 
 def interactive_map(request):
     return render(request, 'map.html')
+
+
+def more_details(request):
+    return JsonResponse(request)

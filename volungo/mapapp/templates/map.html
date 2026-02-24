@@ -2,6 +2,8 @@
     <title>Volungo Map</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <!-- Leaflet JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
 
     <style>
     body {
@@ -189,8 +191,8 @@
     /* контейнер всього popup */
     .locations-popup .popup-content {
         position: relative;  /* для абсолютного позиціонування елементів */
-        width: 200px;
-        height: 130px;
+        width: 650px;
+        height: 500px;
     }
 
     /* фон для всього popup */
@@ -222,7 +224,7 @@
     }
 
     /* кнопка по центру внизу */
-    .locations-popup .popup-button-wrapper {
+    .locations-popup .details-button-wrapper {
         position: absolute;
         bottom: 20px;
         left: 50%;
@@ -230,7 +232,7 @@
     }
 
     /* стиль кнопки */
-    .locations-popup .popup-btn {
+    .locations-popup .details-btn {
         background-color: white;
         color: #66bb6a;
         border: none;
@@ -241,11 +243,15 @@
         transition: all 0.2s ease;
     }
 
-    .locations-popup .popup-btn:hover {
+    .locations-popup .deyails-btn:hover {
         background-color: #55aa5a;
         color: white;
     }
 
+    .locations-popup.locations-popup > .leaflet-popup-close-button {
+    top: 16px;
+    right: 6px;
+    }
 
     </style>
 </head>
@@ -290,6 +296,12 @@
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Leaflet Routing Machine JS -->
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+
+<!-- Твій основний скрипт -->
+<script src="main.js"></script>
+
 <script>
   const map = L.map('map').setView([49.84, 24.03], 13);
 
@@ -307,23 +319,31 @@
 
     // додаємо піни на карту
     locations.forEach(loc => {
-    L.marker([loc.lat, loc.lon])
-      .addTo(map)
-      .bindPopup(
+    const marker = L.marker([loc.lat, loc.lon])
+    .addTo(map)
+    .bindPopup(
         `<div class="popup-content">
-    <div class="popup-title-wrapper">
-        <h3 class="popup-title">${loc.popup}</h3>
-    </div>
-    <div class="popup-text-wrapper">
-        <p class="popup-text">Потрібна допомога</p>
-    </div>
-    <div class="popup-button-wrapper">
-        <button class="popup-btn">Детальніше</button>
-    </div>
-</div>`,
-        { className: "locations-popup" }
-      );
+            <div class="popup-title-wrapper">
+                <h3 class="popup-title">${loc.popup}</h3>
+            </div>
+            <div class="popup-text-wrapper">
+                <p class="popup-text">Потрібна допомога</p>
+            </div>
+            <div class="details-button-wrapper">
+                <button class="details-btn">Детальніше</button>
+            </div>
+        </div>`,
+        { className: "locations-popup", maxWidth: 10000 }
+    );
+
+    // Ось тут додаємо центрування карти при відкритті popup
+    marker.on('popupopen', function() {
+        const latLng = marker.getLatLng();
+        const offsetLat = 0.0075; // трохи піднімаємо вгору, регулюй під себе
+        map.setView([latLng.lat + offsetLat, latLng.lng], 15);
+        map.panBy([0, -1100]);  // -100 пікселів вгору, тобто маркер нижче
     });
+});
 
   // === GEO POPUP ===
   const popup = document.getElementById("geolocation-popup");
