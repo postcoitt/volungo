@@ -410,9 +410,15 @@
 
   <h1 id="our-name">Volungo</h1>
 
-  <button id="profile-button" title="Ваш профіль">
-    {{ request.user.username|default:"U"|first|upper }}
-  </button>
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'profile' request.user.username %}" id="profile-button" title="Ваш профіль">
+        {{ request.user.username|first|upper }}
+    </a>
+    {% else %}
+    <button id="profile-button" title="Ваш профіль">
+        U
+    </button>
+    {% endif %}
 
   <div class="actions-wrapper">
     <div id="actions">

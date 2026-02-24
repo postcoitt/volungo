@@ -7,4 +7,5 @@ urlpatterns = [
     # apps
     path('', include('mapapp.urls')),
     path('', include('accounts.urls')),
+    path('', include('users.urls'))
 ]
