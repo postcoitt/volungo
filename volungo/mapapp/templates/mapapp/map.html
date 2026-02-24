@@ -1,141 +1,103 @@
+{% load static %}
+<!doctype html>
+<html lang="uk">
 <head>
-    <title>Volungo Map</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Volungo — Карта</title>
 
-    <style>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <style>
+    /* ---------------- your styles (kept base) ---------------- */
+    *, *::before, *::after { box-sizing: border-box; }
     body {
-        background-color: #e6f2e6; /* світло-зелений фон */
-        font-family: "Arial", sans-serif;
-        margin: 0;
-        padding: 0;
+      background-color: #e6f2e6;
+      font-family: "Arial", sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #1b4d1b;
     }
 
     /* Назва сайту */
     #our-name {
-        position: absolute;
-        top: 30px;
-        left: 40px;
-        font-style: italic;
-        font-size: 150px;
-        font-family: "Copperplate", fantasy;
-        text-decoration: underline;
-        color: #1b4d1b; /* темно-зелений */
+      position: absolute;
+      top: 30px;
+      left: 40px;
+      font-style: italic;
+      font-size: 150px;
+      font-family: "Copperplate", fantasy;
+      text-decoration: underline;
+      color: #1b4d1b;
+      z-index: 1000;
+      pointer-events: none;
     }
 
-    /* Кнопка профілю */
+    /* profile button */
     #profile-button {
-        position: absolute;
-        right: 20px;
-        top: 20px;
-        height: 100px;
-        width: 100px;
-        border-radius: 50%;
-        color: #fff;
-        font-size: 18px;
-        background-color: #4caf50; /* яскраво-зелений */
-        border: 3px solid #388e3c;
-        cursor: pointer;
-        transition: all 0.2s ease;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      height: 100px;
+      width: 100px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      background-color: #4caf50;
+      border: 3px solid #388e3c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 1000;
     }
-    #profile-button:hover {
-        background-color: #66bb6a;
-        border-color: #2e7d32;
-    }
+    #profile-button:hover { background-color: #66bb6a; border-color: #2e7d32; }
 
     .actions-wrapper {
-    position: absolute;
-    right: 12.5px;
-    top: 190px;
+      position: absolute;
+      right: 12.5px;
+      top: 190px;
+      z-index: 1000;
     }
 
-    /* Основні дії */
     button.action-btn {
-        height: 40px;
-        width: 140px;
-        font-size: 15px;
-        color: #fff;
-        background-color: #66bb6a;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s ease;
+      height: 40px;
+      width: 140px;
+      font-size: 15px;
+      color: #fff;
+      background-color: #66bb6a;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    button.action-btn:hover {
-        background-color: #81c784;
-    }
+    button.action-btn:hover { background-color: #81c784; }
 
-    #actions {
-    display: flex;
-    gap: 12px;
-    }
-
-    #create-button { }
-    #donation-button { }
-    #filters-button { right: 12.5px; top: 190px; background-color: #81c784; color: #000; }
-    #filters-button:hover { background-color: #a5d6a7; }
+    #actions { display:flex; gap:12px; }
 
     #search-button {
-        position: absolute;
-        right: 12.5px;
-        top: 245px;
-        font-size: 16px;
-        height: 40px;
-        width: 190px;
-        color: #000;
-        background-color: #c8e6c9;
-        border-radius: 8px;
-        border: 1px solid #81c784;
-        cursor: pointer;
-        transition: all 0.2s ease;
+      position: absolute;
+      right: 12.5px;
+      top: 245px;
+      font-size: 16px;
+      height: 40px;
+      width: 190px;
+      color: #000;
+      background-color: #c8e6c9;
+      border-radius: 8px;
+      border: 1px solid #81c784;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 1000;
     }
-    #search-button:hover {
-        background-color: #a5d6a7;
-    }
+    #search-button:hover { background-color: #a5d6a7; }
 
-    /* Контейнер для фільтрів */
-    .filters-container {
-    position: relative;
-    display: inline-block;
-    }
-
-    #filters {
-    position: absolute;
-    top: 45px;   /* під кнопкою */
-    right: 0;
-    width: 120px;
-    background: #e8f5e9;
-    padding: 10px;
-    border: 1px solid #81c784;
-    border-radius: 10px;
-    display: none;
-    z-index: 1000;
-    }
-
-    #filters button {
-        display: block;
-        width: 100%;
-        margin-bottom: 5px;
-        height: 35px;
-        font-size: 14px;
-        background-color: #66bb6a;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    #filters button:hover {
-        background-color: #81c784;
-    }
-
-    /* Карта */
+    /* map container */
     #map {
-        height: 700px;
-        width: 100%;
-        margin-top: 320px; /* відступ від верху для кнопок та заголовку */
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      height: 700px;
+      width: 100%;
+      margin-top: 320px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
     #location-button {
@@ -151,87 +113,293 @@
       cursor: pointer;
       z-index: 1000;
     }
-    #location-button:hover {
-        background-color: #66bb6a;
+    #location-button:hover { background-color: #66bb6a; }
+
+    /* ---------------- Kyba's popup / modal styles -------------- */
+
+    #geolocation-popup {
+      display: none; /* shown by JS on load */
+      position: fixed;
+      height: auto;
+      width: 420px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f5f5f5;
+      border: 2px solid #4caf50;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 2000;
+      text-align: center;
     }
-    </style>
+    #geolocation-popup .buttons { margin-top: 15px; }
+    #geolocation-popup button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: white;
+      transition: background-color 0.2s;
+    }
+    #geolocation-popup button:hover { background-color: #45a049; }
+
+    /* Locations popup (the large styled popup on markers) */
+    .locations-popup .popup-content {
+      position: relative;
+      width: 650px;
+      height: 220px;
+      padding: 18px;
+      box-sizing: border-box;
+    }
+
+    .locations-popup .leaflet-popup-content-wrapper {
+      background-color: #66bb6a;
+      border-radius: 15px;
+      padding: 0;
+      width: auto;
+      height: auto;
+      color: white;
+    }
+
+    .locations-popup .popup-title-wrapper {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .locations-popup .popup-text-wrapper {
+      position: absolute;
+      top: 48px;
+      left: 12px;
+      right: 12px;
+      font-size: 14px;
+      color: white;
+    }
+    .locations-popup .details-button-wrapper {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .locations-popup .details-btn {
+      background-color: white;
+      color: #66bb6a;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .locations-popup .details-btn:hover {
+      background-color: #55aa5a;
+      color: white;
+    }
+
+    /* small dot for user marker */
+    .user-marker .dot {
+      width: 19px;
+      height: 19px;
+      background: #2A93EE;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow:
+        0 0 6px rgba(42,147,238,0.5),
+        0 0 12px rgba(42,147,238,0.3);
+    }
+
+    @media (max-width: 900px) {
+      #our-name { font-size: 72px; left: 16px; top: 8px; }
+      .locations-popup .popup-content { width: 300px; height: auto; }
+    }
+  </style>
 </head>
 
 <body>
 
-<h1 id="our-name">Volungo</h1>
+  <h1 id="our-name">Volungo</h1>
 
-<button id="profile-button">Ваш профіль</button>
+  <button id="profile-button" title="Ваш профіль">
+    {{ request.user.username|default:"U" | first|upper }}
+  </button>
 
-
-
-<div class="actions-wrapper">
+  <div class="actions-wrapper">
     <div id="actions">
-        <button id="create-button" class="action-btn"
-            onclick="window.location.href='/map/create/'">+ Створити подію</button>
-        <button id="donation-button" class="action-btn">$ Зробити донат</button>
+      <button id="create-button" class="action-btn"
+        onclick="window.location.href='{% url 'create_event' %}'">+ Створити подію</button>
+      <button id="donation-button" class="action-btn">$ Зробити донат</button>
 
-        <div class="filters-container">
-            <button id="filters-button" class="action-btn">> Фільтрувати</button>
-
-            <div id="filters">
-                <button id="filter1">Фільтр 1</button>
-                <button id="filter2">Фільтр 2</button>
-                <button id="filter3">Фільтр 3</button>
-            </div>
+      <div class="filters-container">
+        <button id="filters-button" class="action-btn">> Фільтрувати</button>
+        <div id="filters">
+          <button id="filter1">Фільтр 1</button>
+          <button id="filter2">Фільтр 2</button>
+          <button id="filter3">Фільтр 3</button>
         </div>
-
+      </div>
     </div>
-</div>
+  </div>
 
-<button id="search-button">Знайти найближчі</button>
+  <button id="search-button">Знайти найближчі</button>
+  <button id="location-button">Надати мої координати</button>
 
-<button id="location-button">Надати мої координати</button>
-<div id="map"></div>
+  <!-- Geolocation permission popup (Kyba-style) -->
+  <div id="geolocation-popup" role="dialog" aria-modal="true">
+    <p>Надати свої координати?</p>
+    <div class="geolocation-wrapper"></div>
+    <div class="buttons">
+      <button id="yes-button">Так</button>
+      <button id="no-button">Ні</button>
+    </div>
+  </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  const map = L.map('map').setView([49.84, 24.03], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  const events = [
-  {% for event in events %}
-  {
-    lat: {{ event.latitude }},
-    lng: {{ event.longitude }},
-    name: "{{ event.name }}",
-    description: "{{ event.description|truncatechars:100 }}",
-    duration: "{{ event.duration }}",
-    max_volunteers: "{{ event.max_volunteers }}",
-  },
-  {% endfor %}
-];
+  <div id="map"></div>
 
-events.forEach(function(event) {
-  const marker = L.marker([event.lat, event.lng]).addTo(map);
-  marker.bindPopup(`
-    <strong>${event.name}</strong><br>
-    ${event.description}<br>
-    <em>Тривалість: ${event.duration} год. | Макс. волонтерів: ${event.max_volunteers}</em>
-  `);
-});
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  // Фільтри toggle
-  const button = document.getElementById('filters-button');
-  const filters = document.getElementById('filters');
-  const before_clicking = "> Фільтрувати";
-  const after_clicking = "⌄ Фільтрувати";
-  let clicked = false;
+  <script>
+    // --- create events array from DB (your branch storage) ---
+    let events = [
+      {% for event in events %}
+      {
+        lat: {{ event.latitude|default:"null" }},
+        lng: {{ event.longitude|default:"null" }},
+        name: "{{ event.name|escapejs }}",
+        description: "{{ event.description|truncatechars:200|escapejs }}",
+        duration: "{{ event.duration|default:'' }}",
+        max_volunteers: "{{ event.max_volunteers|default:'' }}",
+        id: {{ event.id }},
+      },
+      {% endfor %}
+    ];
 
-  button.addEventListener('click', function() {
-      if (!clicked) {
-          button.innerText = after_clicking;
-          clicked = true;
-          filters.style.display = 'block';
-      } else {
-          button.innerText = before_clicking;
-          clicked = false;
-          filters.style.display = 'none';
+    // remove null coordinates if any (defensive)
+    events = events.filter(e => e.lat !== null && e.lng !== null);
+
+    // --- initialize map ---
+    const map = L.map('map').setView([49.84, 24.03], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // user marker icon
+    const userAvatar = L.divIcon({
+      className: "user-marker",
+      html: "<div class='dot'></div>",
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+
+    // --- add events markers with Kyba-style popup content ---
+    events.forEach(evt => {
+      const marker = L.marker([evt.lat, evt.lng]).addTo(map);
+
+      const popupHtml = `
+        <div class="popup-content">
+          <div class="popup-title-wrapper">
+            <h3 class="popup-title">${evt.name}</h3>
+          </div>
+          <div class="popup-text-wrapper">
+            <p class="popup-text">${evt.description}</p>
+            <p style="margin-top:10px; font-size:13px; opacity:0.95;">
+              <em>Тривалість: ${evt.duration} год. | Макс. волонтерів: ${evt.max_volunteers}</em>
+            </p>
+          </div>
+          <div class="details-button-wrapper">
+            <button class="details-btn" data-event-id="${evt.id}">Детальніше</button>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml, { className: "locations-popup", maxWidth: 10000 });
+
+      // center/pan behavior when popup opens like Kyba's
+      marker.on('popupopen', function() {
+        const latLng = marker.getLatLng();
+        const offsetLat = 0.0075; // tweak as needed
+        map.setView([latLng.lat + offsetLat, latLng.lng], 15);
+        // panBy moves the map in pixels (x, y). negative y moves up.
+        map.panBy([0, -1100], { animate: true, duration: 0.6 });
+      });
+    });
+
+    // "Детальніше" button handler (delegated)
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.matches('.details-btn')) {
+        const id = e.target.dataset.eventId;
+        // navigate to your event detail URL (adjust if your URL is different)
+        window.location.href = `/map/event/${id}/`;
       }
     });
-</script>
+
+    // --- GEO popup logic (ask on page load) ---
+    const geoDialog = document.getElementById("geolocation-popup");
+    const yesButton = document.getElementById("yes-button");
+    const noButton  = document.getElementById("no-button");
+    const locationBtn = document.getElementById("location-button");
+
+    // show dialog immediately on load
+    window.addEventListener('load', () => {
+      // only show if there's a geolocation API available
+      if ("geolocation" in navigator) {
+        geoDialog.style.display = "block";
+      }
+    });
+
+    function handleGeolocationSuccess(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      // add user marker and center
+      const userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
+      userMarker.bindPopup("Ви тут").openPopup();
+      map.setView([lat, lng], 15);
+    }
+
+    function handleGeolocationError(err) {
+      console.warn("Geolocation error:", err);
+      alert("Не вдалося отримати геолокацію (перевірте дозволи).");
+    }
+
+    yesButton.addEventListener('click', () => {
+      geoDialog.style.display = "none";
+      navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
+    });
+
+    noButton.addEventListener('click', () => {
+      geoDialog.style.display = "none";
+    });
+
+    // location button acts similar to "yes"
+    locationBtn.addEventListener('click', () => {
+      navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
+    });
+
+    // --- filters toggle (kept from both branches) ---
+    const button = document.getElementById('filters-button');
+    const filters = document.getElementById('filters');
+    const before_clicking = "> Фільтрувати";
+    const after_clicking  = "⌄ Фільтрувати";
+    let clicked = false;
+
+    button.addEventListener('click', function() {
+      if (!clicked) {
+        button.innerText = after_clicking;
+        clicked = true;
+        filters.style.display = 'block';
+      } else {
+        button.innerText = before_clicking;
+        clicked = false;
+        filters.style.display = 'none';
+      }
+    });
+
+  </script>
+</body>
+</html>
