@@ -3,7 +3,7 @@ from django.shortcuts import render
 def profile_view(request, username):
     context = {
         'username': username,
-        'full_name': usernamegit add .,
+        'full_name': username,
         'age': 30,
         'level': 12,
         'xp': '3400/5000',
