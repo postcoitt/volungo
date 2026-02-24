@@ -1,14 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from .models import Profile
 
 def profile_view(request, username):
+    # Шукаємо профіль у базі даних за ім'ям користувача
+    profile = get_object_or_404(Profile, user__username=username)
+
     context = {
-        'username': username,
-        'full_name': username,
-        'age': 30,
-        'level': 12,
-        'xp': '3400/5000',
-        # Тимчасові посилання на фото (можете замінити на свої)
-        'avatar_url': 'https://i.imgur.com/8Km9tLL.png',
-        'org_logo': 'https://i.imgur.com/he9S6y8.png'
+        'full_name': profile.full_name,
+        'age': profile.age,
+        'level': profile.level,
+        'xp': profile.xp,
+        'avatar_url': profile.avatar.url if profile.avatar else 'https://i.imgur.com/8Km9tLL.png',
     }
     return render(request, 'users/profile.html', context)

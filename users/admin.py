@@ -1,3 +1,4 @@
 from django.contrib import admin
+from .models import Profile  # Обов'язково додай цей рядок
 
-# Register your models here.
+admin.site.register(Profile)
