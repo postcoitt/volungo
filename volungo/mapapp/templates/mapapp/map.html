@@ -87,9 +87,44 @@
       border: 1px solid #81c784;
       cursor: pointer;
       transition: all 0.2s ease;
-      z-index: 1000;
     }
     #search-button:hover { background-color: #a5d6a7; }
+
+    /* Контейнер для фільтрів */
+    .filters-container {
+    position: relative;
+    display: inline-block;
+    }
+
+    #filters {
+    position: absolute;
+    top: 45px;   /* під кнопкою */
+    right: 0;
+    width: 120px;
+    background: #e8f5e9;
+    padding: 10px;
+    border: 1px solid #81c784;
+    border-radius: 10px;
+    display: none;
+    z-index: 1000;
+    }
+
+    #filters button {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+        height: 35px;
+        font-size: 14px;
+        background-color: #66bb6a;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    #filters button:hover {
+        background-color: #81c784;
+    }
 
     /* map container */
     #map {
@@ -99,21 +134,6 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-
-    #location-button {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-    #location-button:hover { background-color: #66bb6a; }
 
     /* ---------------- Kyba's popup / modal styles -------------- */
 
@@ -245,7 +265,7 @@
   </div>
 
   <button id="search-button">Знайти найближчі</button>
-  <button id="location-button">Надати мої координати</button>
+
 
   <!-- Geolocation permission popup (Kyba-style) -->
   <div id="geolocation-popup" role="dialog" aria-modal="true">
@@ -283,10 +303,10 @@
 
     // --- initialize map ---
     const map = L.map('map').setView([49.84, 24.03], 13);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19}).addTo(map);
 
     // user marker icon
     const userAvatar = L.divIcon({
@@ -325,7 +345,6 @@
         const offsetLat = 0.0075; // tweak as needed
         map.setView([latLng.lat + offsetLat, latLng.lng], 15);
         // panBy moves the map in pixels (x, y). negative y moves up.
-        map.panBy([0, -1100], { animate: true, duration: 0.6 });
       });
     });
 
@@ -339,16 +358,15 @@
     });
 
     // --- GEO popup logic (ask on page load) ---
-    const geoDialog = document.getElementById("geolocation-popup");
+    const popup = document.getElementById("geolocation-popup");
     const yesButton = document.getElementById("yes-button");
     const noButton  = document.getElementById("no-button");
-    const locationBtn = document.getElementById("location-button");
 
     // show dialog immediately on load
     window.addEventListener('load', () => {
       // only show if there's a geolocation API available
       if ("geolocation" in navigator) {
-        geoDialog.style.display = "block";
+        popup.style.display = "block";
       }
     });
 
@@ -358,7 +376,7 @@
 
       // add user marker and center
       const userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
-      userMarker.bindPopup("Ви тут").openPopup();
+      userMarker.openPopup();
       map.setView([lat, lng], 15);
     }
 
@@ -367,19 +385,38 @@
       alert("Не вдалося отримати геолокацію (перевірте дозволи).");
     }
 
-    yesButton.addEventListener('click', () => {
-      geoDialog.style.display = "none";
-      navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
-    });
+    yesButton.addEventListener("click", () => {
+     popup.style.display = "none";
 
-    noButton.addEventListener('click', () => {
-      geoDialog.style.display = "none";
-    });
+     navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
 
-    // location button acts similar to "yes"
-    locationBtn.addEventListener('click', () => {
-      navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
-    });
+            console.log("Координати:", lat, lon);
+
+            const userAvatar = L.divIcon({
+                className: "user-marker",
+                html: "<div class='dot'></div>",
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            const userMarker = L.marker([lat, lon], {icon: userAvatar}).addTo(map)
+                .openPopup();
+
+            map.setView([lat, lon], 15);
+        },
+        function(error) {
+            console.error("Помилка геолокації:", error);
+            alert("Не вдалося отримати геолокацію");
+        }
+    );
+});
+   noButton.addEventListener("click", () => {
+    popup.style.display = "none";
+    })
+
 
     // --- filters toggle (kept from both branches) ---
     const button = document.getElementById('filters-button');
