@@ -5,12 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Volungo — Карта</title>
-
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
   <style>
-    /* ---------------- your styles (kept base) ---------------- */
     *, *::before, *::after { box-sizing: border-box; }
     body {
       background-color: #e6f2e6;
@@ -20,7 +16,6 @@
       color: #1b4d1b;
     }
 
-    /* Назва сайту */
     #our-name {
       position: absolute;
       top: 30px;
@@ -34,7 +29,6 @@
       pointer-events: none;
     }
 
-    /* profile button */
     #profile-button {
       position: absolute;
       right: 20px;
@@ -72,7 +66,7 @@
     }
     button.action-btn:hover { background-color: #81c784; }
 
-    #actions { display:flex; gap:12px; }
+    #actions { display: flex; gap: 12px; }
 
     #search-button {
       position: absolute;
@@ -87,46 +81,39 @@
       border: 1px solid #81c784;
       cursor: pointer;
       transition: all 0.2s ease;
+      z-index: 1000;
     }
     #search-button:hover { background-color: #a5d6a7; }
 
-    /* Контейнер для фільтрів */
-    .filters-container {
-    position: relative;
-    display: inline-block;
-    }
+    .filters-container { position: relative; display: inline-block; }
 
     #filters {
-    position: absolute;
-    top: 45px;   /* під кнопкою */
-    right: 0;
-    width: 120px;
-    background: #e8f5e9;
-    padding: 10px;
-    border: 1px solid #81c784;
-    border-radius: 10px;
-    display: none;
-    z-index: 1000;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      width: 120px;
+      background: #e8f5e9;
+      padding: 10px;
+      border: 1px solid #81c784;
+      border-radius: 10px;
+      display: none;
+      z-index: 1000;
     }
-
     #filters button {
-        display: block;
-        width: 100%;
-        margin-bottom: 5px;
-        height: 35px;
-        font-size: 14px;
-        background-color: #66bb6a;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
+      display: block;
+      width: 100%;
+      margin-bottom: 5px;
+      height: 35px;
+      font-size: 14px;
+      background-color: #66bb6a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    #filters button:hover {
-        background-color: #81c784;
-    }
+    #filters button:hover { background-color: #81c784; }
 
-    /* map container */
     #map {
       height: 700px;
       width: 100%;
@@ -135,12 +122,10 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    /* ---------------- Kyba's popup / modal styles -------------- */
-
+    /* ── geolocation popup ── */
     #geolocation-popup {
-      display: none; /* shown by JS on load */
+      display: none;
       position: fixed;
-      height: auto;
       width: 420px;
       top: 50%;
       left: 50%;
@@ -150,7 +135,7 @@
       padding: 20px 30px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      z-index: 2000;
+      z-index: 3000;
       text-align: center;
     }
     #geolocation-popup .buttons { margin-top: 15px; }
@@ -167,74 +152,256 @@
     }
     #geolocation-popup button:hover { background-color: #45a049; }
 
-    /* Locations popup (the large styled popup on markers) */
-    .locations-popup .popup-content {
-      position: relative;
-      width: 650px;
-      height: 220px;
-      padding: 18px;
-      box-sizing: border-box;
-    }
-
-    .locations-popup .leaflet-popup-content-wrapper {
-      background-color: #66bb6a;
-      border-radius: 15px;
-      padding: 0;
-      width: auto;
-      height: auto;
-      color: white;
-    }
-
-    .locations-popup .popup-title-wrapper {
-      position: absolute;
-      top: 8px;
-      left: 12px;
-      font-weight: bold;
-      font-size: 20px;
-    }
-    .locations-popup .popup-text-wrapper {
-      position: absolute;
-      top: 48px;
-      left: 12px;
-      right: 12px;
-      font-size: 14px;
-      color: white;
-    }
-    .locations-popup .details-button-wrapper {
-      position: absolute;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .locations-popup .details-btn {
-      background-color: white;
-      color: #66bb6a;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .locations-popup .details-btn:hover {
-      background-color: #55aa5a;
-      color: white;
-    }
-
-    /* small dot for user marker */
+    /* user marker */
     .user-marker .dot {
       width: 19px;
       height: 19px;
       background: #2A93EE;
       border: 3px solid white;
       border-radius: 50%;
-      box-shadow:
-        0 0 6px rgba(42,147,238,0.5),
-        0 0 12px rgba(42,147,238,0.3);
+      box-shadow: 0 0 6px rgba(42,147,238,0.5), 0 0 12px rgba(42,147,238,0.3);
     }
+
+    /* ══════════════════════════════════════
+       EVENT MODAL OVERLAY
+    ══════════════════════════════════════ */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeOverlay 0.2s ease;
+    }
+    #modal-overlay.active { display: flex; }
+
+    @keyframes fadeOverlay {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    #event-modal {
+      background: #fff;
+      border-radius: 16px;
+      width: 680px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+      animation: slideUp 0.25s ease;
+      position: relative;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* close button */
+    #modal-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #f0f0f0;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      transition: background 0.2s;
+      z-index: 10;
+    }
+    #modal-close:hover { background: #e0e0e0; }
+
+    /* modal header */
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      padding: 1.6rem 1.6rem 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #d8ecd8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 2rem;
+      color: #2d6a4f;
+    }
+
+    .modal-header-info { flex: 1; min-width: 0; }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #1b4d1b;
+      margin: 0 2rem 0.3rem 0;
+      line-height: 1.25;
+    }
+
+    /* rating row */
+    .modal-rating-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .star {
+      font-size: 1rem;
+      color: #ddd;
+    }
+    .star.filled { color: #f5a623; }
+    .star.half   { color: #f5a623; opacity: 0.5; }
+
+    .rating-num {
+      font-size: 0.85rem;
+      color: #888;
+      font-weight: 600;
+    }
+
+    /* organiser row */
+    .modal-organiser {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .modal-organiser a {
+      color: #2d6a4f;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .modal-organiser a:hover { text-decoration: underline; }
+
+    /* categories */
+    .modal-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      padding: 0.9rem 1.6rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      font-size: 0.78rem;
+      color: #2d6a4f;
+      font-weight: 500;
+    }
+    .cat-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #4caf50;
+      flex-shrink: 0;
+    }
+
+    /* meta row: time, duration, volunteers */
+    .modal-meta {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0.75rem 1.6rem;
+      border-bottom: 1px solid #eee;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: #555;
+    }
+
+    .meta-icon { font-size: 1rem; }
+
+    /* description */
+    .modal-description {
+      padding: 1rem 1.6rem 0.5rem;
+    }
+
+    .modal-description h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .modal-description p {
+      font-size: 0.9rem;
+      color: #444;
+      line-height: 1.65;
+    }
+
+    /* footer */
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.6rem 1.4rem;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-contact {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.1rem;
+      border: 1.5px solid #4caf50;
+      border-radius: 8px;
+      background: transparent;
+      color: #2d6a4f;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-contact:hover { background: #e8f5e9; }
+
+    .btn-detail {
+      padding: 0.65rem 1.6rem;
+      background: #2d6a4f;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-detail:hover { background: #1a3d2b; transform: translateY(-1px); }
 
     @media (max-width: 900px) {
       #our-name { font-size: 72px; left: 16px; top: 8px; }
-      .locations-popup .popup-content { width: 300px; height: auto; }
+      #event-modal { width: 98vw; }
     }
   </style>
 </head>
@@ -244,7 +411,7 @@
   <h1 id="our-name">Volungo</h1>
 
   <button id="profile-button" title="Ваш профіль">
-    {{ request.user.username|default:"U" | first|upper }}
+    {{ request.user.username|default:"U"|first|upper }}
   </button>
 
   <div class="actions-wrapper">
@@ -266,49 +433,121 @@
 
   <button id="search-button">Знайти найближчі</button>
 
-
-  <!-- Geolocation permission popup (Kyba-style) -->
+  <!-- Geolocation popup -->
   <div id="geolocation-popup" role="dialog" aria-modal="true">
     <p>Надати свої координати?</p>
-    <div class="geolocation-wrapper"></div>
     <div class="buttons">
       <button id="yes-button">Так</button>
       <button id="no-button">Ні</button>
     </div>
   </div>
 
+  <!-- ══ Event modal ══ -->
+  <div id="modal-overlay">
+    <div id="event-modal" role="dialog" aria-modal="true">
+      <button id="modal-close" aria-label="Закрити">✕</button>
+
+      <!-- header: avatar + title + rating -->
+      <div class="modal-header">
+        <div class="modal-avatar">🌿</div>
+        <div class="modal-header-info">
+          <div class="modal-title" id="modal-title">—</div>
+          <div class="modal-rating-row">
+            <div class="stars" id="modal-stars">
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+            </div>
+            <span class="rating-num" id="modal-rating-num">Без рейтингу</span>
+          </div>
+          <div class="modal-organiser">
+            Організатор: <a href="#" id="modal-organiser-link">—</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- categories -->
+      <div class="modal-categories" id="modal-categories"></div>
+
+      <!-- meta: date, duration, volunteers -->
+      <div class="modal-meta">
+        <div class="meta-item">
+          <span class="meta-icon">🕐</span>
+          <span id="modal-duration">—</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-icon">👥</span>
+          <span id="modal-volunteers">—</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-icon">📅</span>
+          <span id="modal-datetime">—</span>
+        </div>
+      </div>
+
+      <!-- description -->
+      <div class="modal-description">
+        <h4>Опис події</h4>
+        <p id="modal-description">—</p>
+      </div>
+
+      <!-- footer buttons -->
+      <div class="modal-footer">
+        <button class="btn-contact">
+          💬 Зв'язатися
+        </button>
+        <a href="#" class="btn-detail" id="modal-detail-btn">Перейти на сторінку →</a>
+      </div>
+    </div>
+  </div>
+
   <div id="map"></div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
   <script>
-    // --- create events array from DB (your branch storage) ---
+    // ── category label map ──
+    const CATEGORY_LABELS = {
+      animals:   'Допомога тваринам',
+      nets:      'Плетіння сіток',
+      shelter:   'Допомога в пансіонаті',
+      food:      'Теплі страви',
+      cleanup:   'Прибирання',
+      children:  'Робота з дітьми',
+      elderly:   'Допомога літнім',
+      medical:   'Медична допомога',
+      transport: 'Транспорт',
+      other:     'Інше',
+    };
+
+    // ── events from Django ──
     let events = [
       {% for event in events %}
       {
-        lat: {{ event.latitude|default:"null" }},
-        lng: {{ event.longitude|default:"null" }},
-        name: "{{ event.name|escapejs }}",
-        description: "{{ event.description|truncatechars:200|escapejs }}",
-        duration: "{{ event.duration|default:'' }}",
+        id:             {{ event.id }},
+        lat:            {{ event.latitude|default:"null" }},
+        lng:            {{ event.longitude|default:"null" }},
+        name:           "{{ event.name|escapejs }}",
+        description:    "{{ event.description|escapejs }}",
+        duration:       "{{ event.duration|default:'' }}",
         max_volunteers: "{{ event.max_volunteers|default:'' }}",
-        id: {{ event.id }},
+        datetime:       "{{ event.datetime|date:'d.m.Y H:i'|default:'' }}",
+        organiser:      "{{ event.organiser.username|escapejs }}",
+        categories: {{ event.categories|safe|default:"[]" }},
       },
       {% endfor %}
     ];
-
-    // remove null coordinates if any (defensive)
     events = events.filter(e => e.lat !== null && e.lng !== null);
 
-    // --- initialize map ---
+    // ── map init ──
     const map = L.map('map').setView([49.84, 24.03], 13);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.carto.com/">CARTO</a>',
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '© CARTO',
       subdomains: 'abcd',
-      maxZoom: 19}).addTo(map);
+      maxZoom: 19
+    }).addTo(map);
 
-    // user marker icon
     const userAvatar = L.divIcon({
       className: "user-marker",
       html: "<div class='dot'></div>",
@@ -316,127 +555,112 @@
       iconAnchor: [10, 10]
     });
 
-    // --- add events markers with Kyba-style popup content ---
+    // ── modal logic ──
+    const overlay      = document.getElementById('modal-overlay');
+    const modalClose   = document.getElementById('modal-close');
+
+    function openModal(evt) {
+      // fill title
+      document.getElementById('modal-title').textContent = evt.name;
+
+      // rating — placeholder until rating logic is added
+      const stars = document.querySelectorAll('#modal-stars .star');
+      stars.forEach(s => s.classList.remove('filled'));
+      document.getElementById('modal-rating-num').textContent = 'Рейтинг незабаром';
+
+      // organiser
+      const orgLink = document.getElementById('modal-organiser-link');
+      orgLink.textContent = evt.organiser || '—';
+      orgLink.href = '#'; // swap to once profile page exists
+
+      // categories
+      const catContainer = document.getElementById('modal-categories');
+      catContainer.innerHTML = '';
+      const cats = Array.isArray(evt.categories) ? evt.categories : [];
+      if (cats.length === 0) {
+        catContainer.innerHTML = '<span style="font-size:0.8rem;color:#aaa;">Категорії не вказані</span>';
+      } else {
+        cats.forEach(c => {
+          const tag = document.createElement('span');
+          tag.className = 'cat-tag';
+          tag.innerHTML = `<span class="cat-dot"></span>${CATEGORY_LABELS[c] || c}`;
+          catContainer.appendChild(tag);
+        });
+      }
+
+      // meta
+      document.getElementById('modal-duration').textContent =
+        evt.duration ? `${evt.duration} год.` : '—';
+      document.getElementById('modal-volunteers').textContent =
+        evt.max_volunteers ? `До ${evt.max_volunteers} волонтерів` : '—';
+      document.getElementById('modal-datetime').textContent =
+        evt.datetime || '—';
+
+      // description
+      document.getElementById('modal-description').textContent =
+        evt.description || '—';
+
+      // detail button
+      document.getElementById('modal-detail-btn').href = `/map/event/${evt.id}/`;
+
+      // show overlay
+      overlay.classList.add('active');
+
+      // pan map
+      map.setView([evt.lat + 0.006, evt.lng], 15);
+    }
+
+    function closeModal() {
+      overlay.classList.remove('active');
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // ── add markers ──
     events.forEach(evt => {
       const marker = L.marker([evt.lat, evt.lng]).addTo(map);
-
-      const popupHtml = `
-        <div class="popup-content">
-          <div class="popup-title-wrapper">
-            <h3 class="popup-title">${evt.name}</h3>
-          </div>
-          <div class="popup-text-wrapper">
-            <p class="popup-text">${evt.description}</p>
-            <p style="margin-top:10px; font-size:13px; opacity:0.95;">
-              <em>Тривалість: ${evt.duration} год. | Макс. волонтерів: ${evt.max_volunteers}</em>
-            </p>
-          </div>
-          <div class="details-button-wrapper">
-            <button class="details-btn" data-event-id="${evt.id}">Детальніше</button>
-          </div>
-        </div>
-      `;
-
-      marker.bindPopup(popupHtml, { className: "locations-popup", maxWidth: 10000 });
-
-      // center/pan behavior when popup opens like Kyba's
-      marker.on('popupopen', function() {
-        const latLng = marker.getLatLng();
-        const offsetLat = 0.0075; // tweak as needed
-        map.setView([latLng.lat + offsetLat, latLng.lng], 15);
-        // panBy moves the map in pixels (x, y). negative y moves up.
+      marker.on('click', function() {
+        openModal(evt);
       });
     });
 
-    // "Детальніше" button handler (delegated)
-    document.addEventListener('click', function(e) {
-      if (e.target && e.target.matches('.details-btn')) {
-        const id = e.target.dataset.eventId;
-        // navigate to your event detail URL (adjust if your URL is different)
-        window.location.href = `/map/event/${id}/`;
-      }
-    });
-
-    // --- GEO popup logic (ask on page load) ---
-    const popup = document.getElementById("geolocation-popup");
-    const yesButton = document.getElementById("yes-button");
-    const noButton  = document.getElementById("no-button");
-
-    // show dialog immediately on load
+    // ── geolocation popup ──
+    const geoPopup = document.getElementById("geolocation-popup");
     window.addEventListener('load', () => {
-      // only show if there's a geolocation API available
-      if ("geolocation" in navigator) {
-        popup.style.display = "block";
-      }
+      if ("geolocation" in navigator) geoPopup.style.display = "block";
     });
 
-    function handleGeolocationSuccess(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      // add user marker and center
-      const userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
-      userMarker.openPopup();
-      map.setView([lat, lng], 15);
-    }
-
-    function handleGeolocationError(err) {
-      console.warn("Geolocation error:", err);
-      alert("Не вдалося отримати геолокацію (перевірте дозволи).");
-    }
-
-    yesButton.addEventListener("click", () => {
-     popup.style.display = "none";
-
-     navigator.geolocation.getCurrentPosition(
-        function(position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-
-            console.log("Координати:", lat, lon);
-
-            const userAvatar = L.divIcon({
-                className: "user-marker",
-                html: "<div class='dot'></div>",
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-            });
-
-            const userMarker = L.marker([lat, lon], {icon: userAvatar}).addTo(map)
-                .openPopup();
-
-            map.setView([lat, lon], 15);
+    document.getElementById("yes-button").addEventListener("click", () => {
+      geoPopup.style.display = "none";
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { latitude: lat, longitude: lng } = pos.coords;
+          L.marker([lat, lng], { icon: userAvatar }).addTo(map);
+          map.setView([lat, lng], 15);
         },
-        function(error) {
-            console.error("Помилка геолокації:", error);
-            alert("Не вдалося отримати геолокацію");
-        }
-    );
-});
-   noButton.addEventListener("click", () => {
-    popup.style.display = "none";
-    })
-
-
-    // --- filters toggle (kept from both branches) ---
-    const button = document.getElementById('filters-button');
-    const filters = document.getElementById('filters');
-    const before_clicking = "> Фільтрувати";
-    const after_clicking  = "⌄ Фільтрувати";
-    let clicked = false;
-
-    button.addEventListener('click', function() {
-      if (!clicked) {
-        button.innerText = after_clicking;
-        clicked = true;
-        filters.style.display = 'block';
-      } else {
-        button.innerText = before_clicking;
-        clicked = false;
-        filters.style.display = 'none';
-      }
+        () => alert("Не вдалося отримати геолокацію")
+      );
     });
 
+    document.getElementById("no-button").addEventListener("click", () => {
+      geoPopup.style.display = "none";
+    });
+
+    // ── filters toggle ──
+    const filtersBtn = document.getElementById('filters-button');
+    const filtersDiv = document.getElementById('filters');
+    let filtersOpen  = false;
+    filtersBtn.addEventListener('click', function() {
+      filtersOpen = !filtersOpen;
+      filtersBtn.innerText  = filtersOpen ? "⌄ Фільтрувати" : "> Фільтрувати";
+      filtersDiv.style.display = filtersOpen ? 'block' : 'none';
+    });
   </script>
 </body>
 </html>
