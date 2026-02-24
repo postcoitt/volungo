@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Карта з організацією</title>
+    <style>
+        
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+
+        .map-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+
+
+        .overlay-backdrop {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+
+        .info-card {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 10;
+            border: 15px solid #f0f0f0;
+        }
+
+
+        .card-header { display: flex; align-items: flex-start; gap: 30px; margin-bottom: 20px; }
+
+
+        .avatar {
+            width: 120px; height: 120px;
+            background-color: #EFE8FF;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            flex-shrink: 0;
+        }
+        .avatar svg { width: 70px; height: 70px; fill: #5D3196; }
+
+
+        .header-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100px; }
+
+        .title-row { display: flex; justify-content: space-between; align-items: center; }
+        .title-row h2 { margin: 0; font-size: 28px; font-weight: 500; }
+        .rating { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .stars { color: #FFC107; font-size: 18px; }
+
+        .tags-row { display: flex; gap: 15px; font-size: 14px; margin-top: 10px; }
+        .tag { display: flex; align-items: center; gap: 5px; }
+        .tag::before { content: '•'; color: black; font-size: 18px; }
+
+        .contact-btn { display: flex; align-items: center; gap: 10px; font-size: 14px; margin-left: auto; cursor: pointer; }
+        .contact-btn svg { width: 24px; height: 24px; }
+
+        /* Опис події */
+        .card-body { font-size: 13px; line-height: 1.6; color: #333; margin-bottom: 20px; }
+        .card-body p { margin-top: 5px; }
+
+        /* Нижня частина з кнопкою */
+        .card-footer { display: flex; justify-content: flex-end; }
+        .btn-primary {
+            background-color: #7BB0FF; color: white;
+            border: none; padding: 12px 24px;
+            font-size: 14px; cursor: pointer; border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover { background-color: #5A95FF; }
+
+        /* Зелений маркер внизу картки */
+        .pin-wrapper {
+            position: absolute; bottom: -60px; left: 50%;
+            transform: translateX(-50%); z-index: 11;
+        }
+        .pin {
+            width: 60px; height: 60px; background-color: #A5F3B4;
+            border-radius: 50%; border: 3px solid #333;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .pin svg { width: 30px; height: 30px; }
+    </style>
+</head>
+<body>
+
+    <div class="map-container">
+        {{ map_html|safe }}
+    </div>
+
+    <div class="overlay-backdrop"></div>
+
+    <div class="info-card">
+        <div class="card-header">
+            <div class="avatar">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+
+            <div class="header-info">
+                <div class="title-row">
+                    <h2>Назва організації</h2>
+                    <div class="rating">4,5 <span class="stars">★★★★★</span></div>
+                </div>
+
+                <div class="tags-row">
+                    <span class="tag">тварини</span>
+                    <span class="tag">робота руками</span>
+                    <span class="tag">0.5 - 3 години</span>
+                </div>
+
+                <div class="contact-btn">
+                    Зв'язатися
+                    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <strong>Опис події</strong>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+
+        <div class="card-footer">
+            <button class="btn-primary">перейти на сторінку</button>
+        </div>
+
+        <div class="pin-wrapper">
+            <div class="pin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
