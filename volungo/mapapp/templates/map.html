@@ -341,7 +341,6 @@
         const latLng = marker.getLatLng();
         const offsetLat = 0.0075; // трохи піднімаємо вгору, регулюй під себе
         map.setView([latLng.lat + offsetLat, latLng.lng], 15);
-        map.panBy([0, -1100]);  // -100 пікселів вгору, тобто маркер нижче
     });
 });
 
