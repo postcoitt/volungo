@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Реєстрація</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f2; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .form-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; margin: 20px 0; }
+        .form-box h2 { color: #064e3b; margin-top: 0; }
+        input { width: 90%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; }
+        ul { list-style: none; padding: 0; color: red; font-size: 12px; text-align: left; }
+        .helptext { font-size: 12px; color: #777; display: block; text-align: left; margin-bottom: 15px; }
+        .btn-blue { background: #f1d35a; color: #000; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .btn-blue:hover { background: #e0c248; }
+        .link { display: block; margin-top: 20px; color: #555; text-decoration: none; }
+        .link:hover { text-decoration: underline; color: #064e3b; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>Приєднатися до нас</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-blue">Створити акаунт</button>
+        </form>
+        <a href="{% url 'login' %}" class="link">Вже маєте акаунт? <strong>Увійти</strong></a>
+    </div>
+</body>
+</html>
