@@ -1,22 +1,68 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
-# ЦЕЙ БЛОК МАЄ БУТИ ПОВЕРНУТО:
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255, blank=True)
-    age = models.IntegerField(default=0)
-    level = models.IntegerField(default=1)
-    xp = models.CharField(max_length=50, default="0/5000")
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+class Badge(models.Model):
+    name = models.CharField(max_length=50, verbose_name="Назва досягнення")
+    icon_url = models.URLField(blank=True, verbose_name="Посилання на іконку")
+    required_xp = models.PositiveIntegerField(default=0, verbose_name="Потрібно годин (XP)")
+    def __str__(self): return self.name
+
+# НОВА МОДЕЛЬ: Бейджі під аватаркою
+class SkillTag(models.Model):
+    name = models.CharField(max_length=50, verbose_name="Назва бейджа (напр. 🌿 активний)")
+    color = models.CharField(max_length=20, default="#14532d", verbose_name="Колір фону (HEX)")
+    def __str__(self): return self.name
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(blank=True, verbose_name="Про себе")
+    badges = models.ManyToManyField(Badge, blank=True, verbose_name="Досягнення")
+
+    # НОВЕ ПОЛЕ: Зв'язок з бейджами під аватаркою
+    skill_tags = models.ManyToManyField(SkillTag, blank=True, verbose_name="Бейджі під аватаркою")
+
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True, verbose_name="Аватар")
+    age = models.PositiveIntegerField(null=True, blank=True, verbose_name="Вік")
+    xp = models.PositiveIntegerField(default=0, verbose_name="Години (XP)")
+    level = models.CharField(max_length=50, default="Новачок", verbose_name="Рівень")
+
+    def __str__(self): return self.user.username
+
+    def save(self, *args, **kwargs):
+        # Автоматична зміна статусу залежно від XP
+        if self.xp < 50:
+            self.level = "Новачок"
+        elif 50 <= self.xp < 150:
+            self.level = "Учасник"
+        elif 150 <= self.xp < 500:
+            self.level = "Просунутий"
+        else:
+            self.level = "Майстер"
+
+        super().save(*args, **kwargs)
+
+class Event(models.Model):
+    title = models.CharField(max_length=100, verbose_name="Назва події")
+    description = models.TextField(verbose_name="Опис")
+    organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events')
+    rating = models.FloatField(default=0.0, verbose_name="Рейтинг події")
+    def __str__(self): return self.title
+
+class HelperReview(models.Model):
+    # Додаємо варіанти вибору типу відгуку
+    REVIEW_TYPES = (
+        ('helper', 'Як помічнику'),
+        ('organizer', 'Як організатору'),
+    )
+    volunteer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_reviews')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='written_reviews')
+
+    # НОВЕ ПОЛЕ: Тип відгуку
+    review_type = models.CharField(max_length=20, choices=REVIEW_TYPES, default='helper', verbose_name="Тип відгуку")
+
+    text = models.TextField(verbose_name="Текст відгуку")
+    rating = models.IntegerField(default=5, verbose_name="Оцінка (1-5)")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
-
-# Твої сигнали (вони у тебе вже є, просто залиш їх нижче)
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance, full_name=instance.username)
+        return f"Відгук ({self.get_review_type_display()}) для {self.volunteer.username}"

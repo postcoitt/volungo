@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Вхід</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f2; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .form-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        .form-box h2 { color: #064e3b; margin-top: 0; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; }
+        .btn-blue { background: #064e3b; color: white; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; margin-top: 15px; }
+        .btn-blue:hover { opacity: 0.9; }
+        .link { display: block; margin-top: 20px; color: #555; text-decoration: none; }
+        .link:hover { text-decoration: underline; color: #064e3b; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>З поверненням!</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-blue">Увійти</button>
+        </form>
+        <a href="{% url 'register' %}" class="link">Ще немає акаунту? <strong>Зареєструватися</strong></a>
+    </div>
+</body>
+</html>

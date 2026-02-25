@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -7,16 +8,122 @@ def profile_view(request, username):
     # Шукаємо профіль у базі даних за ім'ям користувача
     user = User.objects.get(username=username)
     profile = user.profile
+=======
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.models import User
+from django.db.models import Avg
+from .models import UserProfile, Event, HelperReview, Badge
+from .forms import ReviewForm  # Імпортуємо нашу нову форму
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate
+from django.contrib import messages
+
+from .models import UserProfile, Event, HelperReview, Badge, SkillTag # Переконайся, що SkillTag імпортовано!
+
+def check_and_assign_badges(profile):
+    all_badges = Badge.objects.all()
+    for badge in all_badges:
+        # Тепер badge.required_xp буде працювати!
+        if profile.xp >= badge.required_xp:
+            if badge not in profile.badges.all():
+                profile.badges.add(badge)
+    profile.save()
+
+def user_profile(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    profile, created = UserProfile.objects.get_or_create(user=profile_user)
+
+    if request.method == 'POST':
+        if 'avatar' in request.FILES and request.user.is_authenticated:
+            if request.user == profile_user:
+                profile.avatar = request.FILES['avatar']
+                profile.save()
+            return redirect('user_profile', username=username)
+
+        # ДОДАВАННЯ ГОДИН
+        elif 'action' in request.POST and request.POST['action'] == 'add_hours':
+            auth_user, auth_pass = request.POST.get('auth_username'), request.POST.get('auth_password')
+            hours = int(request.POST.get('hours', 0))
+            valid_user = authenticate(request, username=auth_user, password=auth_pass)
+
+            if valid_user is not None:
+                if valid_user == profile_user:
+                    messages.error(request, "Ви не можете самостійно додати собі годин!")
+                else:
+                    if hours > 0:
+                        profile.xp += hours
+                        profile.save()
+                        check_and_assign_badges(profile) # Це для Досягнень
+                        messages.success(request, f"Успішно додано {hours} годин!")
+            else:
+                messages.error(request, "Неправильне ім'я користувача або пароль.")
+            return redirect('user_profile', username=username)
+
+        elif 'action' in request.POST and request.POST['action'] == 'add_friend':
+            # Поки що просто виводимо повідомлення, як ти просила
+            messages.success(request, f"Користувача {profile_user.username} успішно додано до друзів!")
+            return redirect('user_profile', username=username)
+
+        # ДОДАВАННЯ БЕЙДЖА (під аватарку)
+        elif 'action' in request.POST and request.POST['action'] == 'add_badge':
+            auth_user, auth_pass = request.POST.get('auth_username'), request.POST.get('auth_password')
+            tag_id = request.POST.get('tag_id')
+            valid_user = authenticate(request, username=auth_user, password=auth_pass)
+
+            if valid_user is not None:
+                if valid_user == profile_user:
+                    messages.error(request, "Ви не можете самостійно додати собі бейдж!")
+                elif tag_id:
+                    tag = get_object_or_404(SkillTag, id=tag_id)
+                    profile.skill_tags.add(tag)
+                    messages.success(request, f"Бейдж '{tag.name}' успішно додано!")
+            else:
+                messages.error(request, "Неправильне ім'я користувача або пароль.")
+            return redirect('user_profile', username=username)
+
+        # ДОДАВАННЯ ВІДГУКУ
+        elif 'action' in request.POST and request.POST['action'] == 'add_review' and request.user.is_authenticated:
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.volunteer = profile_user
+                review.author = request.user
+                review.save()
+                messages.success(request, "Відгук успішно додано!")
+                return redirect('user_profile', username=username)
+
+    if 'form' not in locals():
+        form = ReviewForm()
+
+    check_and_assign_badges(profile)
+
+    # РОЗДІЛЯЄМО ВІДГУКИ НА ДВІ КАТЕГОРІЇ
+    helper_reviews = HelperReview.objects.filter(volunteer=profile_user, review_type='helper').order_by('-created_at')
+    organizer_reviews = HelperReview.objects.filter(volunteer=profile_user, review_type='organizer').order_by('-created_at')
+
+    # Витягуємо всі існуючі бейджі для випадаючого списку у формі
+    available_tags = SkillTag.objects.all()
+
+    avg_rating = HelperReview.objects.filter(volunteer=profile_user).aggregate(Avg('rating'))['rating__avg']
+    avg_rating = round(avg_rating, 1) if avg_rating else 0
+>>>>>>> yatsko/user_page
 
     context = {
-        'full_name': profile.full_name,
-        'age': profile.age,
-        'level': profile.level,
-        'xp': profile.xp,
-        'avatar_url': profile.avatar.url if profile.avatar else 'https://i.imgur.com/8Km9tLL.png',
+        'avg_rating': avg_rating,
+        'profile_user': profile_user,
+        'profile': profile,
+        'badges': profile.badges.all(), # Досягнення (справа)
+        'skill_tags': profile.skill_tags.all(), # Бейджі (під аватаркою)
+        'available_tags': available_tags, # Всі існуючі бейджі для форми
+        'helper_reviews': helper_reviews,
+        'organizer_reviews': organizer_reviews,
+        'form': form,
     }
     return render(request, 'users/profile.html', context)
 
+<<<<<<< HEAD
 
 @login_required
 def my_profile_redirect(request):
@@ -24,3 +131,26 @@ def my_profile_redirect(request):
 
 def test_event_view(request):
     return render(request, 'users/events/event.html')
+=======
+# === РЕЄСТРАЦІЯ ===
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Автоматично створюємо профіль для нового користувача
+            UserProfile.objects.get_or_create(user=user)
+            # Одразу логінимо його після успішної реєстрації
+            login(request, user)
+            return redirect('my_profile') # Перенаправляємо на його сторінку
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'users/register.html', {'form': form})
+
+# === РОЗУМНЕ ПЕРЕНАПРАВЛЕННЯ НА СВІЙ ПРОФІЛЬ ===
+@login_required
+def my_profile(request):
+    # Ця функція бере логін поточного користувача і кидає його на його ж сторінку
+    return redirect('user_profile', username=request.user.username)
+>>>>>>> yatsko/user_page
