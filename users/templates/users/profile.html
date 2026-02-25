@@ -53,6 +53,75 @@
         .stars { color: #f1d35a; font-size: 18px; margin: 5px 0; font-weight: bold; }
         .quote { font-style: italic; color: #555; margin: 10px 0; }
 
+        .user-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid #eee;
+}
+
+    .stat-box {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+}
+
+    .stat-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #14532d; /* Зелений колір годин */
+}
+
+    .stat-label {
+        font-size: 11px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+}
+
+    .stat-divider {
+        width: 1px;
+        height: 30px;
+        background: #ddd;
+}
+    .btn-friend-modern {
+    background-color: #14532d; /* Твій фірмовий темно-зелений */
+    color: white;
+    border: 2px solid #14532d;
+    padding: 10px 20px;
+    border-radius: 30px; /* Робимо кнопку округлою */
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Плавна анімація */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Ефект при наведенні мишкою */
+.btn-friend-modern:hover {
+    background-color: white;
+    color: #14532d;
+    transform: translateY(-2px); /* Кнопка трохи піднімається */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Ефект при натисканні */
+.btn-friend-modern:active {
+    transform: translateY(0);
+}
+
+.btn-friend-modern .icon {
+    font-size: 16px;
+}
+
         /* Права частина */
         .achievements { width: 300px; }
         .achievements h2 { font-size: 32px; margin-bottom: 25px; color: #064e3b; }
@@ -89,7 +158,17 @@
         {% endif %}
 
         <div class="level-tag">{{ profile.level }}</div>
-        <div class="xp-info">XP: {{ profile.xp }} | @{{ profile_user.username }}</div>
+        <div class="user-stats">
+            <div class="stat-box">
+                <span class="stat-value">{{ profile.xp }}</span>
+                <span class="stat-label">годин</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-box">
+                <span class="stat-value">⭐ {{ avg_rating }}</span>
+                <span class="stat-label">рейтинг</span>
+            </div>
+        </div>
 
         <div class="skill-tags">
             {% for tag in skill_tags %}
@@ -116,7 +195,13 @@
         {% endif %}
 
         <div class="actions">
-            <button class="btn btn-blue">+ Додати до друзів</button>
+            <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_friend">
+                <button type="submit" class="btn-friend-modern">
+                    <span class="icon">👤</span> Додати до друзів
+                </button>
+            </form>
             <button class="btn btn-outline" onclick="document.getElementById('review-form').style.display='block'">Додати відгук</button>
             <button class="btn btn-outline" style="border-color: #f1d35a; color: #a64d79;" onclick="document.getElementById('hours-form').style.display='block'">+ Додати години</button>
             <button class="btn btn-outline" style="border-color: #14532d; color: #14532d;" onclick="document.getElementById('badge-form').style.display='block'">+ Додати бейдж</button>

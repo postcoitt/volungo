@@ -28,6 +28,19 @@ class UserProfile(models.Model):
 
     def __str__(self): return self.user.username
 
+    def save(self, *args, **kwargs):
+        # Автоматична зміна статусу залежно від XP
+        if self.xp < 50:
+            self.level = "Новачок"
+        elif 50 <= self.xp < 150:
+            self.level = "Учасник"
+        elif 150 <= self.xp < 500:
+            self.level = "Просунутий"
+        else:
+            self.level = "Майстер"
+
+        super().save(*args, **kwargs)
+
 class Event(models.Model):
     title = models.CharField(max_length=100, verbose_name="Назва події")
     description = models.TextField(verbose_name="Опис")

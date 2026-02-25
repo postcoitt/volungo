@@ -50,6 +50,11 @@ def user_profile(request, username):
                 messages.error(request, "Неправильне ім'я користувача або пароль.")
             return redirect('user_profile', username=username)
 
+        elif 'action' in request.POST and request.POST['action'] == 'add_friend':
+            # Поки що просто виводимо повідомлення, як ти просила
+            messages.success(request, f"Користувача {profile_user.username} успішно додано до друзів!")
+            return redirect('user_profile', username=username)
+
         # ДОДАВАННЯ БЕЙДЖА (під аватарку)
         elif 'action' in request.POST and request.POST['action'] == 'add_badge':
             auth_user, auth_pass = request.POST.get('auth_username'), request.POST.get('auth_password')
@@ -90,7 +95,11 @@ def user_profile(request, username):
     # Витягуємо всі існуючі бейджі для випадаючого списку у формі
     available_tags = SkillTag.objects.all()
 
+    avg_rating = HelperReview.objects.filter(volunteer=profile_user).aggregate(Avg('rating'))['rating__avg']
+    avg_rating = round(avg_rating, 1) if avg_rating else 0
+
     context = {
+        'avg_rating': avg_rating,
         'profile_user': profile_user,
         'profile': profile,
         'badges': profile.badges.all(), # Досягнення (справа)
