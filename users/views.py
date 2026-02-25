@@ -1,14 +1,5 @@
-<<<<<<< HEAD
+
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-
-
-def profile_view(request, username):
-    # Шукаємо профіль у базі даних за ім'ям користувача
-    user = User.objects.get(username=username)
-    profile = user.profile
-=======
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.db.models import Avg
@@ -108,7 +99,6 @@ def user_profile(request, username):
 
     avg_rating = HelperReview.objects.filter(volunteer=profile_user).aggregate(Avg('rating'))['rating__avg']
     avg_rating = round(avg_rating, 1) if avg_rating else 0
->>>>>>> yatsko/user_page
 
     context = {
         'avg_rating': avg_rating,
@@ -123,15 +113,13 @@ def user_profile(request, username):
     }
     return render(request, 'users/profile.html', context)
 
-<<<<<<< HEAD
-
 @login_required
 def my_profile_redirect(request):
     return redirect('profile', username=request.user.username)
 
 def test_event_view(request):
     return render(request, 'users/events/event.html')
-=======
+
 # === РЕЄСТРАЦІЯ ===
 def register(request):
     if request.method == 'POST':
@@ -153,4 +141,3 @@ def register(request):
 def my_profile(request):
     # Ця функція бере логін поточного користувача і кидає його на його ж сторінку
     return redirect('user_profile', username=request.user.username)
->>>>>>> yatsko/user_page

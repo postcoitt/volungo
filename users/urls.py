@@ -3,11 +3,10 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-<<<<<<< HEAD
-    path('profile/<str:username>/', views.profile_view, name='profile'),
+    path('profile/<str:username>/', views.user_profile, name='profile'),
     path('my-profile/', views.my_profile_redirect, name='my_profile'),
     path('test-event/', views.test_event_view, name='test_event'),
-=======
+
     # Сторінки входу та реєстрації
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
@@ -18,5 +17,4 @@ urlpatterns = [
 
     # Твоя сторінка профілю (має бути в самому кінці!)
     path('<str:username>/', views.user_profile, name='user_profile'),
->>>>>>> yatsko/user_page
 ]
