@@ -21,3 +21,6 @@ def profile_view(request, username):
 @login_required
 def my_profile_redirect(request):
     return redirect('profile', username=request.user.username)
+
+def test_event_view(request):
+    return render(request, 'users/events/event.html')
