@@ -141,3 +141,7 @@ def register(request):
 def my_profile(request):
     # Ця функція бере логін поточного користувача і кидає його на його ж сторінку
     return redirect('user_profile', username=request.user.username)
+
+def test_event_view(request):
+    event = Event.objects.first()
+    return render(request, 'users/events/event.html', {'event': event})

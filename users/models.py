@@ -46,6 +46,13 @@ class Event(models.Model):
     description = models.TextField(verbose_name="Опис")
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events')
     rating = models.FloatField(default=0.0, verbose_name="Рейтинг події")
+    date = models.DateField(null=True, blank=True, verbose_name="Дата проведення")
+    start_time = models.TimeField(null=True, blank=True, verbose_name="Час початку")
+    end_time = models.TimeField(null=True, blank=True, verbose_name="Час завершення")
+    location = models.CharField(max_length=255, null=True, blank=True, verbose_name="Локація (Де зустрічаємось?)")
+    requirements = models.TextField(null=True, blank=True, verbose_name="Що взяти з собою? (кожний пункт з нового рядка)")
+    program = models.TextField(null=True, blank=True, verbose_name="Програма або план дій")
+
     def __str__(self): return self.title
 
 class HelperReview(models.Model):
