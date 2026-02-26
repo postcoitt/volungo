@@ -1,15 +1,37 @@
+# accounts/views.py
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from .forms import EmailOrUsernameAuthForm
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.contrib.auth.models import User
 
 def login_view(request):
-    form = EmailOrUsernameAuthForm()
+    # Якщо користувач вже залогінений, редіректимо його на свій профіль
+    if request.user.is_authenticated:
+        return redirect('my_profile')
 
     if request.method == 'POST':
-        form = EmailOrUsernameAuthForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('/')
+        identifier = request.POST.get('identifier')  # username або email
+        password = request.POST.get('password')
 
-    return render(request, 'accounts/login.html', {'form': form})
+        user_obj = None
+        # шукаємо користувача по username
+        try:
+            user_obj = User.objects.get(username=identifier)
+        except User.DoesNotExist:
+            # якщо не знайшли, шукаємо по email
+            try:
+                user_obj = User.objects.get(email=identifier)
+            except User.DoesNotExist:
+                user_obj = None
+
+        if user_obj:
+            user = authenticate(request, username=user_obj.username, password=password)
+            if user:
+                login(request, user)
+                return redirect('my_profile')  # редірект після успішного входу
+
+        # Якщо логін не вдалий
+        messages.error(request, "Невірний логін або пароль")
+
+    # GET запит або невдалий POST
+    return render(request, 'accounts/login.html')

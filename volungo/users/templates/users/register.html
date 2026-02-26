@@ -379,33 +379,20 @@
       <form method="POST" action="{% url 'register' %}">
         {% csrf_token %}
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="id_first_name">First name</label>
-            {{ form.first_name }}
-            {{ form.first_name.errors }}
-          </div>
-          <div class="form-group">
-            <label for="id_last_name">Last name</label>
-            {{ form.last_name }}
-            {{ form.last_name.errors }}
-          </div>
-        </div>
-
         <div class="form-group">
-          <label for="id_username">Username</label>
+          <label for="{{ form.username.id_for_label }}">Username</label>
           {{ form.username }}
           {{ form.username.errors }}
         </div>
 
         <div class="form-group">
-          <label for="id_email">Email address</label>
+          <label for="{{ form.email.id_for_label }}">Email address</label>
           {{ form.email }}
           {{ form.email.errors }}
         </div>
 
         <div class="form-group">
-          <label for="id_password1">Password</label>
+          <label for="{{ form.password1.id_for_label }}">Password</label>
           {{ form.password1 }}
           {{ form.password1.errors }}
           <div class="strength-bar" id="strengthBar">
@@ -418,7 +405,7 @@
         </div>
 
         <div class="form-group">
-          <label for="id_password2">Confirm password</label>
+          <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
           {{ form.password2 }}
           {{ form.password2.errors }}
         </div>
