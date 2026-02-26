@@ -2,11 +2,11 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>{{ event.title }} - Деталі події</title>
+    <title>{{ event.name }} - Деталі події</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f5; margin: 0; padding: 0; color: #333; line-height: 1.6; }
 
-   
+
         .top-header { background-color: white; color: #1a6b46; padding: 15px 40px; font-size: 15px; font-weight: 600; border-bottom: 1px solid #e1e8e4; }
         .top-header a { text-decoration: none; color: #1a6b46; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .top-header a:hover { color: #111; }
@@ -64,7 +64,7 @@
 
     <div class="container">
         <div class="event-hero">
-            <h1 class="hero-title">{{ event.title }}</h1>
+            <h1 class="hero-title">{{ event.name }}</h1>
             <div class="hero-location">
                 📍 {% if event.location %}{{ event.location }}{% else %}Локація уточнюється{% endif %}
             </div>
@@ -101,10 +101,9 @@
                         <div class="info-text">
                             <strong>Коли?</strong>
                             <span>
-                                {% if event.date %}
-                                    {{ event.date|date:"d E Y" }}<br>
-                                    {% if event.start_time %}{{ event.start_time|time:"H:i" }}{% endif %}
-                                    {% if event.end_time %} — {{ event.end_time|time:"H:i" }}{% endif %}
+                                {% if {{ event.datetime|date:"d.m.Y" }} %}
+                                    {{ event.datetime|date:"d.m.Y" }}<br>
+                                    {{ event.datetime|time:"H:i" }}
                                 {% else %}
                                     <span class="empty-info">Дата уточнюється</span>
                                 {% endif %}

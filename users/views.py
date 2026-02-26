@@ -117,9 +117,6 @@ def user_profile(request, username):
 def my_profile_redirect(request):
     return redirect('profile', username=request.user.username)
 
-def test_event_view(request):
-    return render(request, 'users/events/event.html')
-
 # === РЕЄСТРАЦІЯ ===
 def register(request):
     if request.method == 'POST':
@@ -143,5 +140,11 @@ def my_profile(request):
     return redirect('user_profile', username=request.user.username)
 
 def test_event_view(request):
-    event = Event.objects.first()
+    from mapapp.models import Event as MapEvent
+    event = MapEvent.objects.first()
+    return render(request, 'users/events/event.html', {'event': event})
+
+def event_detail_view(request, event_id):
+    from mapapp.models import Event as MapEvent
+    event = get_object_or_404(MapEvent, id=event_id)
     return render(request, 'users/events/event.html', {'event': event})
