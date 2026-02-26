@@ -58,7 +58,7 @@
 
     <div class="top-header">
         <div class="container" style="padding: 0; margin: 0 auto;">
-            <a href="#">← Повернутися до всіх подій</a>
+            <a href="{% url 'map' %}">← Повернутися до всіх подій</a>
         </div>
     </div>
 
@@ -101,7 +101,7 @@
                         <div class="info-text">
                             <strong>Коли?</strong>
                             <span>
-                                {% if {{ event.datetime|date:"d.m.Y" }} %}
+                                {% if event.datetime %}
                                     {{ event.datetime|date:"d.m.Y" }}<br>
                                     {{ event.datetime|time:"H:i" }}
                                 {% else %}
@@ -135,7 +135,13 @@
                         </div>
                     </div>
 
-                    <a href="{% url 'user_profile' event.organizer.username %}" class="btn-profile">Перейти в профіль</a>
+                    {% if event.organiser and event.organiser.username %}
+                        <a href="{% url 'user_profile' event.organiser.username %}" class="btn-profile">
+                            Перейти в профіль
+                        </a>
+                    {% else %}
+                        <span class="empty-info">Профіль організатора недоступний</span>
+                    {% endif %}
                 </div>
             </div>
         </div>

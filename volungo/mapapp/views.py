@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import EventForm
 from .models import Event
@@ -45,3 +45,8 @@ def create_event(request):
 
     form = EventForm()
     return render(request, 'mapapp/create_event.html', {'form': form})
+
+
+def event_detail_view(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    return render(request, 'users/events/event.html', {'event': event})
