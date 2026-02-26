@@ -132,7 +132,10 @@
 </head>
 <body>
 
-<div class="header">Профіль учасника</div>
+<div class="header" style="display: flex; align-items: center; justify-content: space-between;">
+    <span>Профіль учасника</span>
+    <a href="{% url 'map' %}" style="color: white; font-size: 16px; font-weight: normal; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); transition: background 0.2s;">← Повернутись до карти</a>
+</div>
 
 <div class="container">
     <div class="sidebar">
