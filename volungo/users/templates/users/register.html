@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Volungo – Join Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:   #1a3d2b;
+      --moss:     #2d6a4f;
+      --leaf:     #52b788;
+      --mint:     #b7e4c7;
+      --cream:    #f4f1eb;
+      --bark:     #3d2b1f;
+      --gold:     #c9a84c;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      overflow: hidden;
+    }
+
+    /* ── left panel ── */
+    .panel-left {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      background: var(--cream);
+      position: relative;
+      overflow-y: auto;
+    }
+
+    /* subtle corner accents */
+    .panel-left::before,
+    .panel-left::after {
+      content: '';
+      position: absolute;
+      width: 120px; height: 120px;
+      border-color: var(--mint);
+      border-style: solid;
+      opacity: 0.5;
+    }
+    .panel-left::before { top: 2rem; left: 2rem; border-width: 1px 0 0 1px; }
+    .panel-left::after  { bottom: 2rem; right: 2rem; border-width: 0 1px 1px 0; }
+
+    .form-card {
+      width: 100%;
+      max-width: 400px;
+      animation: fadeUp 0.6s ease both;
+      padding: 1rem 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-header { margin-bottom: 2rem; }
+
+    .form-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--leaf);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 2rem;
+      color: var(--forest);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .form-subtitle {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 0.9rem;
+      color: var(--moss);
+      opacity: 0.75;
+      margin-top: 0.4rem;
+    }
+
+    /* two-column grid for name fields */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--bark);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid #d4ccbe;
+      border-radius: 8px;
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--forest);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--leaf);
+      box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
+    }
+
+    /* password strength bar */
+    .strength-bar {
+      display: flex;
+      gap: 4px;
+      margin-top: 0.4rem;
+    }
+    .strength-segment {
+      flex: 1;
+      height: 3px;
+      border-radius: 2px;
+      background: #ddd9d0;
+      transition: background 0.3s;
+    }
+    .strength-segment.active-weak   { background: #e74c3c; }
+    .strength-segment.active-fair   { background: var(--gold); }
+    .strength-segment.active-strong { background: var(--leaf); }
+
+    .strength-label {
+      font-size: 0.7rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+
+    /* Django form error messages */
+    .errorlist {
+      list-style: none;
+      margin-top: 0.35rem;
+    }
+    .errorlist li {
+      font-size: 0.78rem;
+      color: #c0392b;
+    }
+
+    /* terms checkbox */
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      margin-bottom: 1.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--moss);
+      cursor: pointer;
+    }
+
+    .checkbox-group span {
+      font-size: 0.82rem;
+      color: #7a7468;
+      line-height: 1.45;
+    }
+
+    .checkbox-group a {
+      color: var(--moss);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .checkbox-group a:hover { text-decoration: underline; }
+
+    .btn-register {
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--moss);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-register:hover  { background: var(--forest); transform: translateY(-1px); }
+    .btn-register:active { transform: translateY(0); }
+
+    .btn-register::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .signin-row {
+      text-align: center;
+      margin-top: 1.4rem;
+      font-size: 0.85rem;
+      color: #7a7468;
+    }
+    .signin-row a {
+      color: var(--moss);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .signin-row a:hover { text-decoration: underline; }
+
+    /* ── right decorative panel ── */
+    .panel-right {
+      position: relative;
+      background: var(--forest);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3.5rem;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.35;
+    }
+    .blob-1 { width: 420px; height: 420px; background: var(--moss);  top: -100px; right: -80px; }
+    .blob-2 { width: 280px; height: 280px; background: var(--leaf);  top: 40%;   right: 30%;  opacity: 0.2; }
+    .blob-3 { width: 340px; height: 340px; background: var(--forest); bottom: -80px; left: -60px; opacity: 0.6; }
+
+    .leaf-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(82,183,136,0.12) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    .deco-ring {
+      position: absolute;
+      width: 380px; height: 380px;
+      border: 1.5px solid rgba(82,183,136,0.2);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .deco-ring-2 {
+      position: absolute;
+      width: 240px; height: 240px;
+      border: 1px solid rgba(82,183,136,0.12);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .panel-right-content { position: relative; z-index: 2; }
+
+    .wordmark {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 2.6rem;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .wordmark span { color: var(--leaf); }
+
+    .tagline {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1rem;
+      color: var(--mint);
+      opacity: 0.8;
+      margin-bottom: 3rem;
+    }
+
+    /* benefit list */
+    .benefits { display: flex; flex-direction: column; gap: 1.4rem; }
+
+    .benefit {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .benefit-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(82,183,136,0.15);
+      border: 1px solid rgba(82,183,136,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+
+    .benefit-text {}
+    .benefit-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--cream);
+      margin-bottom: 0.2rem;
+    }
+    .benefit-desc {
+      font-size: 0.8rem;
+      color: var(--mint);
+      opacity: 0.65;
+      line-height: 1.5;
+    }
+
+    /* divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 1.2rem 0;
+      color: #bbb8b0;
+      font-size: 0.78rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #ddd9d0;
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      body { grid-template-columns: 1fr; overflow: auto; }
+      .panel-right { display: none; }
+      .panel-left { overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Left form panel ── -->
+  <div class="panel-left">
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-eyebrow">New here?</div>
+        <div class="form-title">Create your<br>account</div>
+        <div class="form-subtitle">Start making a difference today.</div>
+      </div>
+
+      <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="id_first_name">First name</label>
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+          </div>
+          <div class="form-group">
+            <label for="id_last_name">Last name</label>
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_username">Username</label>
+          {{ form.username }}
+          {{ form.username.errors }}
+        </div>
+
+        <div class="form-group">
+          <label for="id_email">Email address</label>
+          {{ form.email }}
+          {{ form.email.errors }}
+        </div>
+
+        <div class="form-group">
+          <label for="id_password1">Password</label>
+          {{ form.password1 }}
+          {{ form.password1.errors }}
+          <div class="strength-bar" id="strengthBar">
+            <div class="strength-segment" id="seg1"></div>
+            <div class="strength-segment" id="seg2"></div>
+            <div class="strength-segment" id="seg3"></div>
+            <div class="strength-segment" id="seg4"></div>
+          </div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_password2">Confirm password</label>
+          {{ form.password2 }}
+          {{ form.password2.errors }}
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="errorlist">
+            {% for error in form.non_field_errors %}
+              <p style="font-size:0.82rem; color:#c0392b; margin-bottom:0.6rem;">{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="terms" name="terms" required />
+          <span>I agree to Volungo's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+        </div>
+
+        <button type="submit" class="btn-register">Create account</button>
+      </form>
+
+      <div class="signin-row">
+        Already have an account? <a href="{% url 'login' %}">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right decorative panel ── -->
+  <div class="panel-right">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="leaf-grid"></div>
+    <div class="deco-ring"></div>
+    <div class="deco-ring-2"></div>
+
+    <div class="panel-right-content">
+      <div class="wordmark">Volun<span>go</span></div>
+      <div class="tagline">Volunteering, wherever you are.</div>
+
+      <div class="benefits">
+        <div class="benefit">
+          <div class="benefit-icon">🌍</div>
+          <div class="benefit-text">
+            <div class="benefit-title">Find missions near you</div>
+            <div class="benefit-desc">Browse hundreds of local and remote opportunities matched to your skills and schedule.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">🤝</div>
+          <div class="benefit-text">
+            <div class="benefit-title">Join a community</div>
+            <div class="benefit-desc">Connect with 4,200+ volunteers who share your passion for positive change.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">📋</div>
+          <div class="benefit-text">
+            <div class="benefit-title">Track your impact</div>
+            <div class="benefit-desc">Log your hours, collect references, and build a verified volunteer résumé.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">🔔</div>
+          <div class="benefit-text">
+            <div class="benefit-title">Never miss a mission</div>
+            <div class="benefit-desc">Get alerts for new opportunities that fit your profile — always free, always relevant.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Password strength indicator
+    const pwInput = document.getElementById('id_password1');
+    const segments = [
+      document.getElementById('seg1'),
+      document.getElementById('seg2'),
+      document.getElementById('seg3'),
+      document.getElementById('seg4'),
+    ];
+    const label = document.getElementById('strengthLabel');
+
+    if (pwInput) {
+      pwInput.addEventListener('input', () => {
+        const val = pwInput.value;
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        const classes = ['active-weak', 'active-fair', 'active-fair', 'active-strong'];
+        const labels  = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+        const cls     = score <= 1 ? 'active-weak' : score <= 2 ? 'active-fair' : 'active-strong';
+
+        segments.forEach((seg, i) => {
+          seg.className = 'strength-segment';
+          if (i < score) seg.classList.add(cls);
+        });
+
+        label.textContent = val.length ? labels[score] : '';
+        label.style.color = cls === 'active-weak' ? '#e74c3c' : cls === 'active-fair' ? '#c9a84c' : '#52b788';
+      });
+    }
+  </script>
+
+</body>
+</html>
