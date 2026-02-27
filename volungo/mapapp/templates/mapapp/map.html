@@ -471,6 +471,42 @@
     }
     .btn-detail:hover { background: #1a3d2b; transform: translateY(-1px); }
 
+    /* ══ ДОДАНО: банер-підказка "клікни на карту щоб вибрати точку" ══ */
+    #pick-location-hint {
+      display: none;
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1b4d1b;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      z-index: 4000;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: hintPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.6; }
+    }
+
+    /* Курсор-прицел коли активний режим вибору точки */
+    body.picking-location #map { cursor: crosshair; }
+
+    /* Кнопка "Вибрати точку вручну" у геолокаційному попапі */
+    #pick-button {
+      background-color: #8e24aa !important;
+      font-size: 13px !important;
+      padding: 8px 14px !important;
+      margin-top: 8px !important;
+    }
+    #pick-button:hover { background-color: #6a1b9a !important; }
+
     @media (max-width: 900px) {
       #our-name { font-size: 72px; left: 16px; top: 8px; }
       #event-modal { width: 98vw; }
@@ -516,7 +552,14 @@
       <button id="yes-button">Так</button>
       <button id="no-button">Ні</button>
     </div>
+    <!-- ДОДАНО: альтернатива — вибрати точку вручну на карті -->
+    <div style="margin-top:10px;">
+      <button id="pick-button">📍 Вибрати точку на карті</button>
+    </div>
   </div>
+
+  <!-- ДОДАНО: підказка яка з'являється під час режиму вибору точки -->
+  <div id="pick-location-hint">📍 Клікніть на карту щоб вибрати вашу точку</div>
 
   <!-- ══ Event modal ══ -->
   <div id="modal-overlay">
@@ -816,14 +859,6 @@
       marker.on('click', () => openModal(evt));
     });
 
-    // При кліку на карту — прибираємо маршрут
-    map.on('click', function() {
-      if (activeRoutingControl) {
-        map.removeControl(activeRoutingControl);
-        activeRoutingControl = null;
-      }
-    });
-
     // ── geolocation ──
     const geoPopup = document.getElementById("geolocation-popup");
     window.addEventListener('load', () => {
@@ -835,7 +870,8 @@
       navigator.geolocation.getCurrentPosition(
         pos => {
           const { latitude: lat, longitude: lng } = pos.coords;
-          L.marker([lat, lng], { icon: userAvatar }).addTo(map);
+          if (window.userMarker) map.removeLayer(window.userMarker);
+          window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
           map.setView([lat, lng], 15);
           userCoords = { lat, lng };
         },
@@ -847,7 +883,43 @@
       geoPopup.style.display = "none";
     });
 
-    // ── filters toggle ──
+    // ДОДАНО: режим ручного вибору точки на карті
+    let pickingLocation = false;
+    const pickHint = document.getElementById('pick-location-hint');
+
+    document.getElementById("pick-button").addEventListener("click", () => {
+      geoPopup.style.display = "none";
+      pickingLocation = true;
+      pickHint.style.display = 'block';
+      document.body.classList.add('picking-location');
+    });
+
+    // ДОДАНО: обробка кліку на карту — або вибір точки, або очистка маршруту
+    map.on('click', function(e) {
+      if (pickingLocation) {
+        // Зберігаємо вибрану точку як userCoords
+        const { lat, lng } = e.latlng;
+        userCoords = { lat, lng };
+
+        // Якщо вже був маркер користувача — видаляємо
+        if (window.userMarker) {
+          map.removeLayer(window.userMarker);
+        }
+        window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
+
+        // Вимикаємо режим вибору
+        pickingLocation = false;
+        pickHint.style.display = 'none';
+        document.body.classList.remove('picking-location');
+        return; // не чистимо маршрут при виборі точки
+      }
+
+      // Звичайний клік — прибираємо маршрут
+      if (activeRoutingControl) {
+        map.removeControl(activeRoutingControl);
+        activeRoutingControl = null;
+      }
+    });
     const filtersBtn = document.getElementById('filters-button');
     const filtersDiv = document.getElementById('filters');
     let filtersOpen  = false;
