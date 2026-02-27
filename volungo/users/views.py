@@ -133,3 +133,12 @@ def test_event_view(request):
     from mapapp.models import Event as MapEvent
     event = MapEvent.objects.first()
     return render(request, 'users/events/event.html', {'event': event})
+
+@login_required
+def delete_review(request, review_id):
+    from .models import HelperReview
+    review = get_object_or_404(HelperReview, id=review_id)
+    if review.author == request.user:
+        username = review.volunteer.username
+        review.delete()
+    return redirect('user_profile', username=username)
