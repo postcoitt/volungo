@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import EventForm
 from .models import Event
+from django.db.models import Avg
 
 def my_button_action(request):
     result = {"message": 'Кнопка натиснулась і працює! Слава Богу!'}
@@ -18,7 +19,13 @@ def filters_button_action(request):
     return JsonResponse({"buttfiltersons": filters})
 
 def interactive_map(request):
-    events = Event.objects.all()
+    from users.models import HelperReview
+    events = Event.objects.all().select_related('organiser')
+    for event in events:
+        event.organiser_avg_rating = HelperReview.objects.filter(
+            volunteer=event.organiser,
+            review_type='organizer'
+        ).aggregate(Avg('rating'))['rating__avg']
     return render(request, 'mapapp/map.html', {'events': events})
 
 @login_required
