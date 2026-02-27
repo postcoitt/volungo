@@ -21,18 +21,18 @@
         .xp-info { font-size: 14px; margin: 10px 0 20px; color: #444; }
 
         .skill-tags div {
-    border-radius: 20px;
-    padding: 6px 15px;
-    color: #e0e0e0;
-    margin-bottom: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    border: 2px solid #222;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+            border-radius: 20px;
+            padding: 6px 15px;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid #222;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
         /* Центр */
         .content { flex: 1; }
@@ -50,75 +50,77 @@
         .event-item { margin-top: 20px; display: flex; gap: 15px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .event-details { width: 100%; }
         .event-details strong { font-size: 20px; color: #064e3b; }
-        .stars { color: #f1d35a; font-size: 18px; margin: 5px 0; font-weight: bold; }
+
+        /* ЗМІНЕНО: зірки тепер рендеряться динамічно через JS, стиль залишений */
+        .stars { font-size: 18px; margin: 5px 0; font-weight: bold; display: flex; align-items: center; gap: 4px; }
+        .stars .star-filled { color: #f1d35a; }
+        .stars .star-empty  { color: #ddd; }
+        .stars .rating-num  { font-size: 14px; color: #888; font-weight: 600; margin-left: 4px; }
+
         .quote { font-style: italic; color: #555; margin: 10px 0; }
 
         .user-stats {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-top: 15px;
-    background: #f9f9f9;
-    border-radius: 12px;
-    padding: 10px;
-    border: 1px solid #eee;
-}
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
 
-    .stat-box {
-        display: flex;
-        flex-direction: column;
-        text-align: center;
-}
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
 
-    .stat-value {
-        font-size: 18px;
-        font-weight: bold;
-        color: #14532d;
-}
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #14532d;
+        }
 
-    .stat-label {
-        font-size: 11px;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-}
+        .stat-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    .stat-divider {
-        width: 1px;
-        height: 30px;
-        background: #ddd;
-}
-    .btn-friend-modern {
-    background-color: #14532d;
-    color: white;
-    border: 2px solid #14532d;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
+        .stat-divider {
+            width: 1px;
+            height: 30px;
+            background: #ddd;
+        }
 
-.btn-friend-modern:hover {
-    background-color: white;
-    color: #14532d;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
+        .btn-friend-modern {
+            background-color: #14532d;
+            color: white;
+            border: 2px solid #14532d;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.btn-friend-modern:active {
-    transform: translateY(0);
-}
+        .btn-friend-modern:hover {
+            background-color: white;
+            color: #14532d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
 
-.btn-friend-modern .icon {
-    font-size: 16px;
-}
+        .btn-friend-modern:active { transform: translateY(0); }
+        .btn-friend-modern .icon { font-size: 16px; }
 
         /* Права частина */
         .achievements { width: 300px; }
@@ -271,7 +273,8 @@
             <div class="event-item">
                 <span style="font-size: 24px;">🤝</span>
                 <div class="event-details">
-                    <div class="stars">{{ review.rating }} ⭐⭐⭐⭐⭐</div>
+                    <!-- ЗМІНЕНО: data-rating передає реальну оцінку, JS рендерить зірки -->
+                    <div class="stars" data-rating="{{ review.rating }}"></div>
                     <p class="quote">"{{ review.text }}"</p>
                     <div class="author" style="display: flex; align-items: center; justify-content: space-between;">
                         <span>Від: <strong>{{ review.author.username }}</strong></span>
@@ -293,7 +296,8 @@
             <div class="event-item" style="border-left: 5px solid #c2b35a;">
                 <span style="font-size: 24px;">🏢</span>
                 <div class="event-details">
-                    <div class="stars">{{ review.rating }} ⭐⭐⭐⭐⭐</div>
+                    <!-- ЗМІНЕНО: data-rating передає реальну оцінку, JS рендерить зірки -->
+                    <div class="stars" data-rating="{{ review.rating }}"></div>
                     <p class="quote">"{{ review.text }}"</p>
                     <div class="author" style="display: flex; align-items: center; justify-content: space-between;">
                         <span>Від: <strong>{{ review.author.username }}</strong></span>
@@ -320,6 +324,23 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- ДОДАНО: скрипт що рендерить зірки динамічно по data-rating -->
+<script>
+  document.querySelectorAll('.stars[data-rating]').forEach(function(el) {
+    const rating = parseInt(el.getAttribute('data-rating'), 10);
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      if (i <= rating) {
+        html += '<span class="star-filled">★</span>';
+      } else {
+        html += '<span class="star-empty">★</span>';
+      }
+    }
+    html += '<span class="rating-num">' + rating + '/5</span>';
+    el.innerHTML = html;
+  });
+</script>
 
 </body>
 </html>
