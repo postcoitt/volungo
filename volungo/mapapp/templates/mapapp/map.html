@@ -6,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Volungo — Карта</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <!-- ДОДАНО: Leaflet Routing Machine CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
+  <style>
+    /* ДОДАНО: приховуємо стандартну панель інструкцій LRM — нам потрібна лише відстань */
+    .leaflet-routing-container { display: none !important; }
+  </style>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body {
@@ -261,6 +267,18 @@
     }
     .modal-organiser a:hover { border-bottom-color: #2d6a4f; }
 
+    /* ══ ДОДАНО: стиль блоку відстані ══ */
+    .modal-route {
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 0.5rem;
+      display: none;
+    }
+    .modal-route-distance {
+      font-weight: 600;
+      color: #2d6a4f;
+    }
+
     .modal-rating-label {
       font-size: 0.68rem;
       text-transform: uppercase;
@@ -466,6 +484,11 @@
             Організатор: <a href="#" id="modal-organiser-link">—</a>
           </div>
 
+          <!-- ДОДАНО: відстань по маршруту (між організатором та рейтингом) -->
+          <div class="modal-route" id="modal-route">
+            🗺️ <span id="modal-route-text">—</span>
+          </div>
+
           <div class="modal-rating-label">Рейтинг організатора</div>
           <div class="modal-rating-row">
             <div class="stars" id="modal-stars"></div>
@@ -515,6 +538,8 @@
   </script>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- ДОДАНО: Leaflet Routing Machine -->
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
   <script>
     const CATEGORY_LABELS = {
       animals:   'Допомога тваринам',
@@ -528,6 +553,9 @@
       transport: 'Транспорт',
       other:     'Інше',
     };
+
+    // ДОДАНО: зберігаємо координати користувача після надання геолокації
+    let userCoords = null;
 
     let events = [
       {% for event in events %}
@@ -583,6 +611,58 @@
         w.appendChild(fill);
         container.appendChild(w);
       }
+    }
+
+    // ДОДАНО: активний маршрут LRM (щоб видаляти попередній при відкритті нової події)
+    let activeRoutingControl = null;
+
+    // ДОДАНО: розрахунок відстані через Leaflet Routing Machine + OSRM
+    // Малює лінію маршруту на карті та повертає відстань у текстовому вигляді
+    function showRouteOnMap(fromLat, fromLng, toLat, toLng, onDistance) {
+      // Видаляємо попередній маршрут якщо є
+      if (activeRoutingControl) {
+        map.removeControl(activeRoutingControl);
+        activeRoutingControl = null;
+      }
+
+      const control = L.Routing.control({
+        waypoints: [
+          L.latLng(fromLat, fromLng),
+          L.latLng(toLat, toLng),
+        ],
+        router: L.Routing.osrmv1({
+          serviceUrl: 'https://router.project-osrm.org/route/v1',
+          language: 'uk',
+        }),
+        // Лінія маршруту на карті — зелена, в стилі сайту
+        lineOptions: {
+          styles: [{ color: '#2d6a4f', weight: 4, opacity: 0.75 }],
+          extendToWaypoints: true,
+          missingRouteTolerance: 0,
+        },
+        // Маркери початку/кінця — приховуємо, бо вже є наші маркери
+        createMarker: () => null,
+        // Панель з покроковими інструкціями — прихована через CSS
+        show: false,
+        addWaypoints: false,
+        fitSelectedRoutes: false,
+        showAlternatives: false,
+      });
+
+      control.on('routesfound', function(e) {
+        const meters = e.routes[0].summary.totalDistance;
+        const distText = meters >= 1000
+          ? (meters / 1000).toFixed(1) + ' км'
+          : Math.round(meters) + ' м';
+        onDistance(distText);
+      });
+
+      control.on('routingerror', function() {
+        onDistance(null);
+      });
+
+      control.addTo(map);
+      activeRoutingControl = control;
     }
 
     // ── map init ──
@@ -644,9 +724,31 @@
 
       overlay.classList.add('active');
       map.setView([evt.lat + 0.006, evt.lng], 15);
+
+      // ДОДАНО: розраховуємо відстань по маршруту та малюємо лінію на карті через LRM
+      const routeEl  = document.getElementById('modal-route');
+      const routeTxt = document.getElementById('modal-route-text');
+      if (userCoords) {
+        routeEl.style.display = 'block';
+        routeTxt.innerHTML = 'Розраховується…';
+        showRouteOnMap(userCoords.lat, userCoords.lng, evt.lat, evt.lng, function(dist) {
+          routeTxt.innerHTML = dist
+            ? `<span class="modal-route-distance">${dist}</span> по дорозі`
+            : 'Не вдалося розрахувати';
+        });
+      } else {
+        routeEl.style.display = 'none';
+      }
     }
 
-    function closeModal() { overlay.classList.remove('active'); }
+    function closeModal() {
+      overlay.classList.remove('active');
+      // ДОДАНО: прибираємо лінію маршруту з карти при закритті модалки
+      if (activeRoutingControl) {
+        map.removeControl(activeRoutingControl);
+        activeRoutingControl = null;
+      }
+    }
 
     modalClose.addEventListener('click', closeModal);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
@@ -670,6 +772,8 @@
           const { latitude: lat, longitude: lng } = pos.coords;
           L.marker([lat, lng], { icon: userAvatar }).addTo(map);
           map.setView([lat, lng], 15);
+          // ДОДАНО: зберігаємо координати для подальшого використання в модалці
+          userCoords = { lat, lng };
         },
         () => alert("Не вдалося отримати геолокацію")
       );
