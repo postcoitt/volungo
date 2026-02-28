@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
   <style>
-    /* Приховуємо стандартну панель інструкцій LRM */
     .leaflet-routing-container { display: none !important; }
   </style>
   <style>
@@ -221,7 +220,6 @@
     }
     #modal-close:hover { background: #e0e0e0; }
 
-    /* header: аватар | інфо | права панель відстані */
     .modal-header {
       display: flex;
       align-items: flex-start;
@@ -308,9 +306,8 @@
       font-weight: 600;
     }
 
-    /* ══ ПРАВА ПАНЕЛЬ — відстань + кнопка маршруту ══ */
     .modal-route-panel {
-      display: none;            /* показується лише коли є геолокація */
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -332,7 +329,6 @@
       font-weight: 600;
     }
 
-    /* Велике число відстані */
     .modal-route-distance {
       font-size: 1.55rem;
       font-weight: 800;
@@ -345,7 +341,6 @@
       color: #999;
     }
 
-    /* Кнопка "Маршрут" */
     .btn-show-route {
       display: flex;
       align-items: center;
@@ -363,11 +358,7 @@
       margin-top: 0.2rem;
     }
     .btn-show-route:hover { background: #1a3d2b; transform: translateY(-1px); }
-    .btn-show-route:disabled {
-      background: #a5d6a7;
-      cursor: default;
-      transform: none;
-    }
+    .btn-show-route:disabled { background: #a5d6a7; cursor: default; transform: none; }
 
     .modal-categories {
       display: flex;
@@ -471,7 +462,21 @@
     }
     .btn-detail:hover { background: #1a3d2b; transform: translateY(-1px); }
 
-    /* ══ ДОДАНО: банер-підказка "клікни на карту щоб вибрати точку" ══ */
+    /* registered badge inside modal */
+    .modal-registered-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.7rem;
+      background: #e8f5e9;
+      border: 1.5px solid #2ecc71;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #1a7a40;
+      margin-bottom: 0.4rem;
+    }
+
     #pick-location-hint {
       display: none;
       position: fixed;
@@ -495,10 +500,8 @@
       50%       { opacity: 0.6; }
     }
 
-    /* Курсор-прицел коли активний режим вибору точки */
     body.picking-location #map { cursor: crosshair; }
 
-    /* Кнопка "Вибрати точку вручну" у геолокаційному попапі */
     #pick-button {
       background-color: #8e24aa !important;
       font-size: 13px !important;
@@ -546,19 +549,39 @@
 
   <button id="search-button">Знайти найближчі</button>
 
+  <!-- Expired events popup — shown only to organiser when their event is overdue -->
+  {% if expired_events %}
+  <div id="expired-popup" style="display:flex; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:5000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:16px; padding:2rem; max-width:480px; width:90%; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+      <div style="font-size:2.5rem; margin-bottom:0.8rem;">⏰</div>
+      <h2 style="color:#1b4d1b; margin:0 0 0.5rem; font-size:1.4rem;">Час підвести підсумки!</h2>
+      <p style="color:#666; margin-bottom:1.5rem; font-size:0.92rem;">
+        Термін закінчився для:
+        {% for e in expired_events %}
+          <strong>{{ e.name }}</strong>{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+      {% for e in expired_events %}
+      <a href="{% url 'event_resolve' e.id %}"
+         style="display:block; margin-bottom:8px; padding:13px 24px; background:#2d6a4f; color:#fff; border-radius:10px; font-weight:700; text-decoration:none; font-size:0.95rem;">
+        🏁 Завершити "{{ e.name }}"
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
   <div id="geolocation-popup" role="dialog" aria-modal="true">
     <p>Надати свої координати?</p>
     <div class="buttons">
       <button id="yes-button">Так</button>
       <button id="no-button">Ні</button>
     </div>
-    <!-- ДОДАНО: альтернатива — вибрати точку вручну на карті -->
     <div style="margin-top:10px;">
       <button id="pick-button">📍 Вибрати точку на карті</button>
     </div>
   </div>
 
-  <!-- ДОДАНО: підказка яка з'являється під час режиму вибору точки -->
   <div id="pick-location-hint">📍 Клікніть на карту щоб вибрати вашу точку</div>
 
   <!-- ══ Event modal ══ -->
@@ -572,6 +595,11 @@
         <div class="modal-header-info">
           <div class="modal-title" id="modal-title">—</div>
 
+          <!-- registered badge — shown only if user is signed up -->
+          <div class="modal-registered-badge" id="modal-registered-badge" style="display:none;">
+            ✓ Ви записані
+          </div>
+
           <div class="modal-organiser">
             Організатор: <a href="#" id="modal-organiser-link">—</a>
           </div>
@@ -583,7 +611,6 @@
           </div>
         </div>
 
-        <!-- ДОДАНО: права панель — відстань зверху, кнопка маршруту знизу -->
         <div class="modal-route-panel" id="modal-route-panel">
           <div class="modal-route-label">По дорозі</div>
           <div class="modal-route-distance" id="modal-route-distance">…</div>
@@ -625,13 +652,15 @@
 
   <div id="map"></div>
 
-  <!-- organiser ratings from Django (organizer review type only) -->
   <script>
     const ORGANISER_RATINGS = {
       {% for event in events %}
         "{{ event.organiser.username|escapejs }}": {{ event.organiser_avg_rating|default:"null" }},
       {% endfor %}
     };
+
+    // IDs of events the logged-in user registered for
+    const REGISTERED_IDS = new Set([{% for id in registered_ids %}{{ id }},{% endfor %}]);
   </script>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -651,8 +680,8 @@
     };
 
     let userCoords = null;
-    let currentEvt = null;          // подія відкрита у модалці зараз
-    let activeRoutingControl = null; // активний маршрут LRM на карті
+    let currentEvt = null;
+    let activeRoutingControl = null;
 
     let events = [
       {% for event in events %}
@@ -667,6 +696,7 @@
         datetime:       "{{ event.datetime|date:'d.m.Y H:i'|default:'' }}",
         organiser:      "{{ event.organiser.username|escapejs }}",
         categories:     {{ event.categories|safe|default:"[]" }},
+        registered:     REGISTERED_IDS.has({{ event.id }}),
       },
       {% endfor %}
     ];
@@ -695,22 +725,18 @@
         const w = document.createElement('span');
         w.className = 'star-wrap';
         w.textContent = '★';
-
         const fill = document.createElement('span');
         fill.className = 'star-fill';
         fill.textContent = '★';
-
         let pct = 0;
         if (rating >= i)       pct = 100;
         else if (rating > i-1) pct = Math.round((rating - (i - 1)) * 100);
-
         fill.style.width = pct + '%';
         w.appendChild(fill);
         container.appendChild(w);
       }
     }
 
-    // ── Запит відстані через OSRM без малювання лінії (для показу в панелі) ──
     function fetchDistanceOnly(fromLat, fromLng, toLat, toLng, onResult) {
       const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=false`;
       fetch(url)
@@ -728,34 +754,25 @@
         .catch(() => onResult(null));
     }
 
-    // ── Будує маршрут через Leaflet Routing Machine + підганяє карту ──
     function buildRouteOnMap(fromLat, fromLng, toLat, toLng) {
       if (activeRoutingControl) {
         map.removeControl(activeRoutingControl);
         activeRoutingControl = null;
       }
-
       const control = L.Routing.control({
-        waypoints: [
-          L.latLng(fromLat, fromLng),
-          L.latLng(toLat, toLng),
-        ],
-        router: L.Routing.osrmv1({
-          serviceUrl: 'https://router.project-osrm.org/route/v1',
-          language: 'uk',
-        }),
+        waypoints: [L.latLng(fromLat, fromLng), L.latLng(toLat, toLng)],
+        router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', language: 'uk' }),
         lineOptions: {
           styles: [{ color: '#2d6a4f', weight: 5, opacity: 0.85 }],
           extendToWaypoints: true,
           missingRouteTolerance: 0,
         },
-        createMarker: () => null,  // не перемальовуємо маркери — вони вже є
+        createMarker: () => null,
         show: false,
         addWaypoints: false,
-        fitSelectedRoutes: true,   // карта автоматично підганяє zoom щоб маршрут влазив
+        fitSelectedRoutes: true,
         showAlternatives: false,
       });
-
       control.addTo(map);
       activeRoutingControl = control;
     }
@@ -775,6 +792,14 @@
       iconAnchor: [10, 10]
     });
 
+    // Green marker icon for registered events
+    const greenIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:22px;height:22px;background:#2ecc71;border:3px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(46,204,113,0.7)"></div>',
+      iconSize: [22, 22],
+      iconAnchor: [11, 11]
+    });
+
     const overlay    = document.getElementById('modal-overlay');
     const modalClose = document.getElementById('modal-close');
 
@@ -783,13 +808,16 @@
 
       document.getElementById('modal-title').textContent = evt.name;
 
+      // show/hide registered badge
+      const badge = document.getElementById('modal-registered-badge');
+      badge.style.display = evt.registered ? 'inline-flex' : 'none';
+
       const orgLink = document.getElementById('modal-organiser-link');
       orgLink.textContent = evt.organiser || '—';
       orgLink.href = evt.organiser ? `/profile/${evt.organiser}/` : '#';
 
       const rating = (ORGANISER_RATINGS[evt.organiser] !== undefined)
-        ? ORGANISER_RATINGS[evt.organiser]
-        : null;
+        ? ORGANISER_RATINGS[evt.organiser] : null;
       renderStars(rating);
 
       const catContainer = document.getElementById('modal-categories');
@@ -810,16 +838,13 @@
         evt.duration ? `${evt.duration} год.` : '—';
       document.getElementById('modal-volunteers').textContent =
         evt.max_volunteers ? `До ${evt.max_volunteers} волонтерів` : '—';
-      document.getElementById('modal-datetime').textContent =
-        evt.datetime || '—';
-      document.getElementById('modal-description').textContent =
-        evt.description || '—';
+      document.getElementById('modal-datetime').textContent = evt.datetime || '—';
+      document.getElementById('modal-description').textContent = evt.description || '—';
       document.getElementById('modal-detail-btn').href = `/map/event/${evt.id}/`;
 
       overlay.classList.add('active');
       map.setView([evt.lat + 0.006, evt.lng], 15);
 
-      // Права панель: показуємо лише якщо є геолокація
       const panel    = document.getElementById('modal-route-panel');
       const distEl   = document.getElementById('modal-route-distance');
       const routeBtn = document.getElementById('btn-show-route');
@@ -828,8 +853,6 @@
         panel.style.display = 'flex';
         distEl.textContent  = '…';
         routeBtn.disabled   = true;
-
-        // Тільки запитуємо відстань — маршрут НЕ малюємо автоматично
         fetchDistanceOnly(userCoords.lat, userCoords.lng, evt.lat, evt.lng, function(dist) {
           distEl.textContent = dist || '?';
           routeBtn.disabled  = !dist;
@@ -839,23 +862,23 @@
       }
     }
 
-    function closeModal() {
-      overlay.classList.remove('active');
-    }
+    function closeModal() { overlay.classList.remove('active'); }
 
     modalClose.addEventListener('click', closeModal);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    // Кнопка "Маршрут": закриває модалку → будує маршрут через LRM → карта підганяє zoom
     document.getElementById('btn-show-route').addEventListener('click', function() {
       if (!userCoords || !currentEvt) return;
       closeModal();
       buildRouteOnMap(userCoords.lat, userCoords.lng, currentEvt.lat, currentEvt.lng);
     });
 
+    // ── add markers — green for registered, default blue for others ──
     events.forEach(evt => {
-      const marker = L.marker([evt.lat, evt.lng]).addTo(map);
+      const marker = evt.registered
+        ? L.marker([evt.lat, evt.lng], { icon: greenIcon }).addTo(map)
+        : L.marker([evt.lat, evt.lng]).addTo(map);
       marker.on('click', () => openModal(evt));
     });
 
@@ -883,7 +906,6 @@
       geoPopup.style.display = "none";
     });
 
-    // ДОДАНО: режим ручного вибору точки на карті
     let pickingLocation = false;
     const pickHint = document.getElementById('pick-location-hint');
 
@@ -894,32 +916,23 @@
       document.body.classList.add('picking-location');
     });
 
-    // ДОДАНО: обробка кліку на карту — або вибір точки, або очистка маршруту
     map.on('click', function(e) {
       if (pickingLocation) {
-        // Зберігаємо вибрану точку як userCoords
         const { lat, lng } = e.latlng;
         userCoords = { lat, lng };
-
-        // Якщо вже був маркер користувача — видаляємо
-        if (window.userMarker) {
-          map.removeLayer(window.userMarker);
-        }
+        if (window.userMarker) map.removeLayer(window.userMarker);
         window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
-
-        // Вимикаємо режим вибору
         pickingLocation = false;
         pickHint.style.display = 'none';
         document.body.classList.remove('picking-location');
-        return; // не чистимо маршрут при виборі точки
+        return;
       }
-
-      // Звичайний клік — прибираємо маршрут
       if (activeRoutingControl) {
         map.removeControl(activeRoutingControl);
         activeRoutingControl = null;
       }
     });
+
     const filtersBtn = document.getElementById('filters-button');
     const filtersDiv = document.getElementById('filters');
     let filtersOpen  = false;

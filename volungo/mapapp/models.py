@@ -1,6 +1,4 @@
 from django.db import models
-
-from django.db import models
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -18,7 +16,6 @@ class Event(models.Model):
         ('transport', 'Транспортна допомога'),
         ('other',     'Інше'),
     ]
-
     organiser       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
     name            = models.CharField(max_length=200)
     description     = models.TextField()
@@ -29,6 +26,19 @@ class Event(models.Model):
     latitude        = models.FloatField()
     longitude       = models.FloatField()
     created_at      = models.DateTimeField(auto_now_add=True)
+    is_completed    = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.name)
+
+
+class EventRegistration(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='registrations')
+    user  = models.ForeignKey(User, on_delete=models.CASCADE)
+    registered_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['event', 'user']
+
+    def __str__(self):
+        return f"{self.user.username} → {self.event.name}"

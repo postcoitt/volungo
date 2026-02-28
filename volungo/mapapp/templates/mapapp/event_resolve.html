@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Завершити подію — {{ event.name }}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background-color: #f0f4f2;
+            color: #1b4d1b;
+        }
+
+        .topbar {
+            background: #064e3b;
+            color: white;
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .topbar a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .topbar a:hover { background: rgba(255,255,255,0.1); }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+
+        .event-banner {
+            background: #fff;
+            border: 1px solid #c3dbc8;
+            border-radius: 14px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .event-banner-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+
+        .event-banner h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem;
+            color: #064e3b;
+        }
+
+        .event-banner p {
+            font-size: 0.88rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid #d4e8d4;
+        }
+
+        /* volunteer card */
+        .volunteer-card {
+            background: #fff;
+            border: 1px solid #d4e8d4;
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .volunteer-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .volunteer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #064e3b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            border: 3px solid #f1d35a;
+        }
+
+        .volunteer-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #064e3b;
+        }
+
+        .volunteer-sub {
+            font-size: 0.78rem;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .fields-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 1rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 0.65rem 0.9rem;
+            border: 1.5px solid #c3dbc8;
+            border-radius: 8px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem;
+            color: #1b4d1b;
+            background: #fafff8;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: #2d6a4f;
+            box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
+        }
+
+        textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+        /* star rating picker */
+        .star-picker {
+            display: flex;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .star-picker input[type="radio"] { display: none; }
+
+        .star-picker label {
+            font-size: 1.6rem;
+            color: #ddd;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: 0;
+            transition: color 0.15s, transform 0.1s;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .star-picker input:checked ~ label,
+        .star-picker label:hover,
+        .star-picker label:hover ~ label {
+            color: #ddd;
+        }
+
+        /* highlight stars up to hovered/selected — CSS trick with reversed order */
+        .star-picker {
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .star-picker label:hover,
+        .star-picker label:hover ~ label,
+        .star-picker input:checked ~ label {
+            color: #f5a623;
+        }
+
+        .no-volunteers {
+            background: #fff;
+            border: 1px dashed #c3dbc8;
+            border-radius: 14px;
+            padding: 3rem;
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .no-volunteers span { font-size: 2.5rem; display: block; margin-bottom: 0.8rem; }
+
+        /* submit */
+        .submit-section {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1.5px solid #c3dbc8;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel {
+            padding: 0.8rem 2rem;
+            border: 1.5px solid #c3dbc8;
+            border-radius: 8px;
+            background: transparent;
+            color: #666;
+            font-size: 0.92rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-cancel:hover { border-color: #064e3b; color: #064e3b; }
+
+        .btn-finish {
+            padding: 0.85rem 2.5rem;
+            background: #064e3b;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-finish:hover { background: #043828; transform: translateY(-1px); }
+
+        @media (max-width: 600px) {
+            .fields-row { grid-template-columns: 1fr; }
+            .topbar { padding: 14px 20px; }
+            .container { padding: 1.5rem 1rem 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-title">🏁 Завершення події</div>
+    <a href="{% url 'map' %}">← Повернутись до карти</a>
+</div>
+
+<div class="container">
+
+    <div class="event-banner">
+        <div class="event-banner-icon">🌿</div>
+        <div>
+            <h1>{{ event.name }}</h1>
+            <p>
+                📅 {{ event.datetime|date:"d.m.Y" }} о {{ event.datetime|time:"H:i" }}
+                &nbsp;·&nbsp;
+                👥 Записалось: <strong>{{ registrations|length }}</strong> волонтер(ів)
+            </p>
+        </div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% if registrations %}
+            <div class="section-label">Оцініть кожного волонтера</div>
+
+            {% for reg in registrations %}
+            <div class="volunteer-card">
+                <div class="volunteer-header">
+                    <div class="volunteer-avatar">
+                        {{ reg.user.username|first|upper }}
+                    </div>
+                    <div>
+                        <div class="volunteer-name">{{ reg.user.username }}</div>
+                        <div class="volunteer-sub">Записався: {{ reg.registered_at|date:"d.m.Y" }}</div>
+                    </div>
+                </div>
+
+                <div class="fields-row" style="margin-bottom: 1rem;">
+                    <div class="field-group">
+                        <label for="hours_{{ reg.user.id }}">Годин відпрацьовано</label>
+                        <input type="number" id="hours_{{ reg.user.id }}"
+                               name="hours_{{ reg.user.id }}"
+                               min="0" max="24" step="0.5" placeholder="0">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Оцінка</label>
+                        <div class="star-picker">
+                            {% for i in "54321" %}
+                            <input type="radio" id="star{{ i }}_{{ reg.user.id }}"
+                                   name="rating_{{ reg.user.id }}" value="{{ i }}">
+                            <label for="star{{ i }}_{{ reg.user.id }}" title="{{ i }} зірок">★</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="text_{{ reg.user.id }}">Відгук (необов'язково)</label>
+                    <textarea id="text_{{ reg.user.id }}"
+                              name="text_{{ reg.user.id }}"
+                              placeholder="Напишіть короткий відгук про роботу волонтера…"></textarea>
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="no-volunteers">
+                <span>😔</span>
+                На цю подію ніхто не записався. Ви все одно можете завершити її.
+            </div>
+        {% endif %}
+
+        <div class="submit-section">
+            <a href="{% url 'event_detail' event.id %}" class="btn-cancel">Скасувати</a>
+            <button type="submit" class="btn-finish"
+                    onclick="return confirm('Завершити подію? Це призначить години та відгуки всім волонтерам.')">
+                🏁 Завершити подію
+            </button>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>

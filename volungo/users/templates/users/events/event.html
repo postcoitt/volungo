@@ -94,7 +94,26 @@
 
             <div class="right-column">
                 <div class="card" style="padding: 25px;">
-                    <button class="btn-main">Я йду волонтерити!</button>
+                    {% if request.user.is_authenticated %}
+                        <form method="POST" action="{% url 'register_for_event' event.id %}">
+                            {% csrf_token %}
+                            {% if is_registered %}
+                                <button type="submit" class="btn-main" style="background-color: #2ecc71; box-shadow: 0 4px 0 #27ae60; color: #fff;">
+                                    ✓ Ви записані — скасувати?
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn-main">Я йду волонтерити!</button>
+                            {% endif %}
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn-main" style="display:block; text-align:center; text-decoration:none;">Увійдіть щоб записатись</a>
+                    {% endif %}
+                    {% if request.user == event.organiser and not event.is_completed %}
+                    <a href="{% url 'event_resolve' event.id %}"
+                        style="display:block; margin-top:10px; text-align:center; padding:12px; background:#064e3b; color:white; border-radius:30px; font-weight:700; text-decoration:none;">
+                        🏁 Завершити подію
+                    </a>
+                    {% endif %}
 
                     <div class="info-item">
                         <div class="info-icon">📅</div>
