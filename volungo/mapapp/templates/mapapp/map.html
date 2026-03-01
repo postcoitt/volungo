@@ -91,32 +91,123 @@
 
     .filters-container { position: relative; display: inline-block; }
 
+    /* ══ ПАНЕЛЬ ФІЛЬТРІВ (ОНОВЛЕНИЙ СТИЛЬ) ══ */
     #filters {
-      position: absolute;
-      top: 45px;
-      right: 0;
-      width: 120px;
-      background: #e8f5e9;
-      padding: 10px;
-      border: 1px solid #81c784;
-      border-radius: 10px;
-      display: none;
-      z-index: 1000;
+        position: absolute;
+        top: 45px;
+        right: 0;
+        width: 285px;
+        background: #f0f9f0;
+        padding: 16px;
+        border: 1px solid #81c784;
+        border-radius: 12px;
+        display: none;
+        z-index: 1001;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.14);
     }
-    #filters button {
-      display: block;
-      width: 100%;
-      margin-bottom: 5px;
-      height: 35px;
-      font-size: 14px;
-      background-color: #66bb6a;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+
+    .filter-section-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #2d6a4f;
+        margin: 12px 0 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #c8e6c9;
     }
-    #filters button:hover { background-color: #81c784; }
+    .filter-section-title:first-child { margin-top: 0; }
+
+    /* Кнопки відстані - Горизонтальні чіпи */
+    .filter-dist-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 4px;
+    }
+    .dist-btn {
+        padding: 5px 12px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border: 1.5px solid #81c784;
+        border-radius: 999px;
+        background: #fff;
+        color: #2d6a4f;
+        cursor: pointer;
+        transition: all 0.15s;
+        width: auto; /* Відміна block ширини */
+        height: auto;
+    }
+    .dist-btn:hover { background: #c8e6c9; }
+    .dist-btn.active { background: #2d6a4f; color: #fff; border-color: #2d6a4f; }
+    .dist-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #eee; border-color: #ccc; }
+
+    #dist-no-location {
+        font-size: 0.72rem;
+        color: #c0392b;
+        margin-bottom: 6px;
+        display: none;
+    }
+
+    /* Слайдер рейтингу */
+    .rating-slider-row { display: flex; align-items: center; gap: 10px; }
+    #rating-slider { flex: 1; accent-color: #2d6a4f; cursor: pointer; }
+    #rating-slider-value {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #1b4d1b;
+        min-width: 65px;
+        text-align: right;
+    }
+
+    /* Категорії - Стиль чіпів (замість чекбоксів) */
+    .cat-checkboxes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-height: none;
+        overflow: visible;
+    }
+    /* Приховуємо стандартний чекбокс, стилізуємо label як кнопку */
+    .cat-checkboxes label {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        border: 1.5px solid #81c784;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 600;
+        color: #2d6a4f;
+        background: #fff;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.15s;
+    }
+    .cat-checkboxes label:hover { background: #c8e6c9; }
+    .cat-checkboxes input[type="checkbox"] { display: none; } /* Ховаємо квадратик */
+
+    /* Стиль для вибраної категорії */
+    .cat-checkboxes label:has(input:checked) {
+        background: #2d6a4f;
+        color: #fff;
+        border-color: #2d6a4f;
+    }
+
+    /* Кнопка скидання */
+    #reset-filters {
+        width: 100%;
+        margin-top: 16px;
+        padding: 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        background: #fff;
+        color: #888;
+        border: 1.5px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    #reset-filters:hover { border-color: #999; color: #555; background: #f9f9f9; }
 
     #map {
       height: 700px;
@@ -462,7 +553,6 @@
     }
     .btn-detail:hover { background: #1a3d2b; transform: translateY(-1px); }
 
-    /* registered badge inside modal */
     .modal-registered-badge {
       display: inline-flex;
       align-items: center;
@@ -538,10 +628,45 @@
 
       <div class="filters-container">
         <button id="filters-button" class="action-btn">> Фільтрувати</button>
+
         <div id="filters">
-          <button id="filter1">Фільтр 1</button>
-          <button id="filter2">Фільтр 2</button>
-          <button id="filter3">Фільтр 3</button>
+            <div class="filter-section">
+                <div class="filter-section-title">📍 Відстань від вас</div>
+                <div id="dist-no-location">⚠ Спочатку вкажіть вашу точку</div>
+                <div class="filter-dist-row">
+                    <button class="dist-btn" data-km="2">до 2 км</button>
+                    <button class="dist-btn" data-km="5">до 5 км</button>
+                    <button class="dist-btn" data-km="10">до 10 км</button>
+                    <button class="dist-btn" data-km="20">до 20 км</button>
+                    <button class="dist-btn" data-km="50">до 50 км</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-section-title">⭐ Мін. рейтинг організатора</div>
+                <div class="rating-slider-row">
+                    <input type="range" id="rating-slider" min="0" max="5" step="0.5" value="0">
+                    <span id="rating-slider-value">Будь-який</span>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-section-title">🏷️ Категорії</div>
+                <div class="cat-checkboxes">
+                    <label><input type="checkbox" value="animals">🐾 Тварини</label>
+                    <label><input type="checkbox" value="nets">🪢 Сітки</label>
+                    <label><input type="checkbox" value="shelter">🏠 Пансіонат</label>
+                    <label><input type="checkbox" value="food">🍲 Страви</label>
+                    <label><input type="checkbox" value="cleanup">🧹 Прибирання</label>
+                    <label><input type="checkbox" value="children">👧 Діти</label>
+                    <label><input type="checkbox" value="elderly">👴 Літні</label>
+                    <label><input type="checkbox" value="medical">🏥 Медицина</label>
+                    <label><input type="checkbox" value="transport">🚗 Транспорт</label>
+                    <label><input type="checkbox" value="other">✳️ Інше</label>
+                </div>
+            </div>
+
+            <button id="reset-filters">✕ Скинути всі фільтри</button>
         </div>
       </div>
     </div>
@@ -549,7 +674,7 @@
 
   <button id="search-button">Знайти найближчі</button>
 
-  <!-- Expired events popup — shown only to organiser when their event is overdue -->
+  <!-- Expired events popup -->
   {% if expired_events %}
   <div id="expired-popup" style="display:flex; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:5000; align-items:center; justify-content:center;">
     <div style="background:#fff; border-radius:16px; padding:2rem; max-width:480px; width:90%; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
@@ -595,7 +720,6 @@
         <div class="modal-header-info">
           <div class="modal-title" id="modal-title">—</div>
 
-          <!-- registered badge — shown only if user is signed up -->
           <div class="modal-registered-badge" id="modal-registered-badge" style="display:none;">
             ✓ Ви записані
           </div>
@@ -659,7 +783,6 @@
       {% endfor %}
     };
 
-    // IDs of events the logged-in user registered for
     const REGISTERED_IDS = new Set([{% for id in registered_ids %}{{ id }},{% endfor %}]);
   </script>
 
@@ -668,14 +791,14 @@
   <script>
     const CATEGORY_LABELS = {
       animals:   'Допомога тваринам',
-      nets:      'Плетіння сіток',
+      nets:      'Плетіння сіток для армії',
       shelter:   'Допомога в пансіонаті',
-      food:      'Теплі страви',
-      cleanup:   'Прибирання',
+      food:      'Приготування теплих страв',
+      cleanup:   'Прибирання території',
       children:  'Робота з дітьми',
-      elderly:   'Допомога літнім',
+      elderly:   'Допомога літнім людям',
       medical:   'Медична допомога',
-      transport: 'Транспорт',
+      transport: 'Транспортна допомога',
       other:     'Інше',
     };
 
@@ -701,6 +824,61 @@
       {% endfor %}
     ];
     events = events.filter(e => e.lat !== null && e.lng !== null);
+
+    // ── Стан фільтрів ──
+    const filters = {
+      maxDistKm:  null,   // число або null
+      minRating:  null,   // число або null
+      categories: [],     // масив рядків, порожній = всі
+    };
+
+    // ── Формула Гаверсина — відстань між двома точками у км ──
+    function haversineKm(lat1, lng1, lat2, lng2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) ** 2
+              + Math.cos(lat1 * Math.PI / 180)
+              * Math.cos(lat2 * Math.PI / 180)
+              * Math.sin(dLng/2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // ── Застосувати фільтри — показати/сховати маркери ──
+    function applyFilters() {
+      markers.forEach(({ evt, marker }) => {
+        let visible = true;
+
+        // Фільтр за відстанню
+        if (filters.maxDistKm !== null) {
+          if (!userCoords) {
+            visible = false;
+          } else {
+            const km = haversineKm(userCoords.lat, userCoords.lng, evt.lat, evt.lng);
+            if (km > filters.maxDistKm) visible = false;
+          }
+        }
+
+        // Фільтр за рейтингом організатора
+        if (visible && filters.minRating !== null) {
+          const r = ORGANISER_RATINGS[evt.organiser];
+          if (r === null || r === undefined || r < filters.minRating) visible = false;
+        }
+
+        // Фільтр за категоріями (подія повинна мати хоча б одну з вибраних)
+        if (visible && filters.categories.length > 0) {
+          const evtCats = Array.isArray(evt.categories) ? evt.categories : [];
+          const match = filters.categories.some(c => evtCats.includes(c));
+          if (!match) visible = false;
+        }
+
+        if (visible) {
+          if (!map.hasLayer(marker)) marker.addTo(map);
+        } else {
+          if (map.hasLayer(marker)) marker.remove();
+        }
+      });
+    }
 
     // ── half-star renderer ──
     function renderStars(rating) {
@@ -747,9 +925,7 @@
             onResult(meters >= 1000
               ? (meters / 1000).toFixed(1) + ' км'
               : Math.round(meters) + ' м');
-          } else {
-            onResult(null);
-          }
+          } else { onResult(null); }
         })
         .catch(() => onResult(null));
     }
@@ -792,7 +968,6 @@
       iconAnchor: [10, 10]
     });
 
-    // Green marker icon for registered events
     const greenIcon = L.divIcon({
       className: '',
       html: '<div style="width:22px;height:22px;background:#2ecc71;border:3px solid #fff;border-radius:50%;box-shadow:0 0 8px rgba(46,204,113,0.7)"></div>',
@@ -808,7 +983,6 @@
 
       document.getElementById('modal-title').textContent = evt.name;
 
-      // show/hide registered badge
       const badge = document.getElementById('modal-registered-badge');
       badge.style.display = evt.registered ? 'inline-flex' : 'none';
 
@@ -874,12 +1048,79 @@
       buildRouteOnMap(userCoords.lat, userCoords.lng, currentEvt.lat, currentEvt.lng);
     });
 
-    // ── add markers — green for registered, default blue for others ──
+    // ── Маркери: зберігаємо в масиві для фільтрації ──
+    const markers = [];
     events.forEach(evt => {
       const marker = evt.registered
         ? L.marker([evt.lat, evt.lng], { icon: greenIcon }).addTo(map)
         : L.marker([evt.lat, evt.lng]).addTo(map);
       marker.on('click', () => openModal(evt));
+      markers.push({ evt, marker });
+    });
+
+    // ── Логіка кнопок фільтрів ──
+
+    // Відстань
+    document.querySelectorAll('.dist-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const km = parseFloat(this.dataset.km);
+        if (!userCoords) {
+          // показуємо підказку і нічого не робимо
+          document.getElementById('dist-no-location').style.display = 'block';
+          return;
+        }
+        document.getElementById('dist-no-location').style.display = 'none';
+        if (filters.maxDistKm === km) {
+          // повторний клік — скинути
+          filters.maxDistKm = null;
+          this.classList.remove('active');
+        } else {
+          filters.maxDistKm = km;
+          document.querySelectorAll('.dist-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        }
+        applyFilters();
+      });
+    });
+
+    // Рейтинг — слайдер
+    const ratingSlider = document.getElementById('rating-slider');
+    const ratingValue  = document.getElementById('rating-slider-value');
+    ratingSlider.addEventListener('input', function() {
+      const val = parseFloat(this.value);
+      if (val === 0) {
+        filters.minRating = null;
+        ratingValue.textContent = 'Будь-який';
+      } else {
+        filters.minRating = val;
+        ratingValue.textContent = val.toFixed(1) + '+ ⭐';
+      }
+      applyFilters();
+    });
+
+    // Категорії
+    document.querySelectorAll('.cat-checkboxes input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', function() {
+        if (this.checked) {
+          filters.categories.push(this.value);
+        } else {
+          filters.categories = filters.categories.filter(c => c !== this.value);
+        }
+        applyFilters();
+      });
+    });
+
+    // Скинути всі фільтри
+    document.getElementById('reset-filters').addEventListener('click', function() {
+      filters.maxDistKm  = null;
+      filters.minRating  = null;
+      filters.categories = [];
+      document.querySelectorAll('.dist-btn').forEach(b => b.classList.remove('active'));
+      ratingSlider.value = 0;
+      ratingValue.textContent = 'Будь-який';
+      document.querySelectorAll('.cat-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
+      document.getElementById('dist-no-location').style.display = 'none';
+      applyFilters();
     });
 
     // ── geolocation ──
@@ -897,6 +1138,8 @@
           window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
           map.setView([lat, lng], 15);
           userCoords = { lat, lng };
+          // якщо є активний фільтр відстані — оновлюємо
+          if (filters.maxDistKm !== null) applyFilters();
         },
         () => alert("Не вдалося отримати геолокацію")
       );
@@ -925,6 +1168,8 @@
         pickingLocation = false;
         pickHint.style.display = 'none';
         document.body.classList.remove('picking-location');
+        // якщо є активний фільтр відстані — оновлюємо
+        if (filters.maxDistKm !== null) applyFilters();
         return;
       }
       if (activeRoutingControl) {
@@ -933,6 +1178,7 @@
       }
     });
 
+    // ── filters toggle ──
     const filtersBtn = document.getElementById('filters-button');
     const filtersDiv = document.getElementById('filters');
     let filtersOpen  = false;
@@ -940,6 +1186,12 @@
       filtersOpen = !filtersOpen;
       filtersBtn.innerText = filtersOpen ? "⌄ Фільтрувати" : "> Фільтрувати";
       filtersDiv.style.display = filtersOpen ? 'block' : 'none';
+      // Якщо немає userCoords — блокуємо кнопки відстані
+      if (filtersOpen) {
+        document.querySelectorAll('.dist-btn').forEach(b => {
+          b.disabled = !userCoords;
+        });
+      }
     });
   </script>
 </body>
