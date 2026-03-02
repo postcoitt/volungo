@@ -5,218 +5,362 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Volungo — Карта</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
   <style>
     .leaflet-routing-container { display: none !important; }
   </style>
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:  #1a3d2b;
+      --moss:    #2d6a4f;
+      --leaf:    #52b788;
+      --mint:    #b7e4c7;
+      --cream:   #f4f1eb;
+      --bark:    #3d2b1f;
+      --muted:   #7a7468;
+      --border:  #d4ccbe;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      background-color: #e6f2e6;
-      font-family: "Arial", sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #1b4d1b;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--forest);
+      min-height: 100vh;
     }
 
-    #our-name {
-      position: absolute;
-      top: 30px;
-      left: 40px;
-      font-style: italic;
-      font-size: 150px;
-      font-family: "Copperplate", fantasy;
-      text-decoration: underline;
-      color: #1b4d1b;
+    /* ── topbar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
       z-index: 1000;
-      pointer-events: none;
+      background: var(--forest);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     }
 
-    #profile-button {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      height: 100px;
-      width: 100px;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 18px;
-      background-color: #4caf50;
-      border: 3px solid #388e3c;
+    .wordmark {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 1.6rem;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      pointer-events: auto;
+    }
+    .wordmark span { color: var(--leaf); }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* ── Action buttons in topbar ── */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
-      z-index: 1000;
-    }
-    #profile-button:hover { background-color: #66bb6a; border-color: #2e7d32; }
-
-    .actions-wrapper {
-      position: absolute;
-      right: 12.5px;
-      top: 190px;
-      z-index: 1000;
-    }
-
-    button.action-btn {
-      height: 40px;
-      width: 140px;
-      font-size: 15px;
-      color: #fff;
-      background-color: #66bb6a;
+      transition: all 0.2s;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
     }
-    button.action-btn:hover { background-color: #81c784; }
 
-    #actions { display: flex; gap: 12px; }
-
-    #search-button {
-      position: absolute;
-      right: 12.5px;
-      top: 245px;
-      font-size: 16px;
-      height: 40px;
-      width: 190px;
-      color: #000;
-      background-color: #c8e6c9;
-      border-radius: 8px;
-      border: 1px solid #81c784;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      z-index: 500;
+    .btn-create {
+      background: var(--leaf);
+      color: var(--forest);
     }
-    #search-button:hover { background-color: #a5d6a7; }
+    .btn-create:hover { background: var(--mint); }
 
+    .btn-donate {
+      background: transparent;
+      color: var(--mint);
+      border: 1px solid rgba(183,228,199,0.4);
+    }
+    .btn-donate:hover { background: rgba(255,255,255,0.08); }
+
+    /* ── Filter button ── */
     .filters-container { position: relative; display: inline-block; }
 
-    /* ══ ПАНЕЛЬ ФІЛЬТРІВ (ОНОВЛЕНИЙ СТИЛЬ) ══ */
+    .btn-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      color: var(--mint);
+      border: 1px solid rgba(183,228,199,0.4);
+    }
+    .btn-filter:hover { background: rgba(255,255,255,0.08); }
+
+    /* ── Search ── */
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(183,228,199,0.4);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .search-input-wrap:focus-within {
+      background: rgba(255,255,255,0.15);
+      border-color: var(--leaf);
+    }
+
+    #search-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: #fff;
+      padding: 0.5rem 0.8rem;
+      width: 0;
+      max-width: 0;
+      transition: width 0.3s ease, max-width 0.3s ease, padding 0.3s ease;
+    }
+    #search-input::placeholder { color: rgba(183,228,199,0.6); }
+    #search-input.expanded {
+      width: 200px;
+      max-width: 200px;
+    }
+
+    .btn-search {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      color: var(--mint);
+      border: none;
+    }
+    .btn-search:hover { color: #fff; }
+
+    /* ── Search dropdown ── */
+    #search-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 320px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+      z-index: 2000;
+      overflow: hidden;
+      animation: dropIn 0.15s ease;
+    }
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-dropdown-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-dropdown-item:last-child { border-bottom: none; }
+    .search-dropdown-item:hover { background: #f4f1eb; }
+
+    .search-item-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--forest);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .search-item-meta {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+    .search-item-highlight {
+      color: var(--moss);
+      font-weight: 700;
+    }
+
+    .search-no-results {
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* ── Profile button ── */
+    .btn-profile {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--leaf);
+      border: 2px solid var(--mint);
+      color: var(--forest);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-profile:hover { background: var(--mint); }
+
+    /* ── Filters dropdown ── */
     #filters {
-        position: absolute;
-        top: 45px;
-        right: 0;
-        width: 285px;
-        background: #f0f9f0;
-        padding: 16px;
-        border: 1px solid #81c784;
-        border-radius: 12px;
-        display: none;
-        z-index: 1001;
-        box-shadow: 0 6px 24px rgba(0,0,0,0.14);
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 285px;
+      background: #fff;
+      padding: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      display: none;
+      z-index: 1001;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.12);
     }
 
     .filter-section-title {
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #2d6a4f;
-        margin: 12px 0 8px;
-        padding-bottom: 4px;
-        border-bottom: 1px solid #c8e6c9;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--moss);
+      margin: 12px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
     }
     .filter-section-title:first-child { margin-top: 0; }
 
-    /* Кнопки відстані - Горизонтальні чіпи */
     .filter-dist-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 4px;
     }
+
     .dist-btn {
-        padding: 5px 12px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        border: 1.5px solid #81c784;
-        border-radius: 999px;
-        background: #fff;
-        color: #2d6a4f;
-        cursor: pointer;
-        transition: all 0.15s;
-        width: auto; /* Відміна block ширини */
-        height: auto;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
     }
-    .dist-btn:hover { background: #c8e6c9; }
-    .dist-btn.active { background: #2d6a4f; color: #fff; border-color: #2d6a4f; }
-    .dist-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #eee; border-color: #ccc; }
+    .dist-btn:hover { border-color: var(--leaf); color: var(--forest); }
+    .dist-btn.active { background: var(--moss); color: #fff; border-color: var(--moss); }
+    .dist-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     #dist-no-location {
-        font-size: 0.72rem;
-        color: #c0392b;
-        margin-bottom: 6px;
-        display: none;
+      font-size: 0.72rem;
+      color: #c0392b;
+      margin-bottom: 6px;
+      display: none;
     }
 
-    /* Слайдер рейтингу */
     .rating-slider-row { display: flex; align-items: center; gap: 10px; }
-    #rating-slider { flex: 1; accent-color: #2d6a4f; cursor: pointer; }
+    #rating-slider { flex: 1; accent-color: var(--moss); cursor: pointer; }
     #rating-slider-value {
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: #1b4d1b;
-        min-width: 65px;
-        text-align: right;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--forest);
+      min-width: 65px;
+      text-align: right;
     }
 
-    /* Категорії - Стиль чіпів (замість чекбоксів) */
     .cat-checkboxes {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        max-height: none;
-        overflow: visible;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
-    /* Приховуємо стандартний чекбокс, стилізуємо label як кнопку */
     .cat-checkboxes label {
-        display: inline-flex;
-        align-items: center;
-        padding: 5px 12px;
-        border: 1.5px solid #81c784;
-        border-radius: 999px;
-        font-size: 0.74rem;
-        font-weight: 600;
-        color: #2d6a4f;
-        background: #fff;
-        cursor: pointer;
-        user-select: none;
-        transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 400;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--muted);
+      background: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+      text-transform: none;
+      letter-spacing: 0;
     }
-    .cat-checkboxes label:hover { background: #c8e6c9; }
-    .cat-checkboxes input[type="checkbox"] { display: none; } /* Ховаємо квадратик */
-
-    /* Стиль для вибраної категорії */
+    .cat-checkboxes label:hover { border-color: var(--leaf); color: var(--forest); }
+    .cat-checkboxes input[type="checkbox"] { display: none; }
     .cat-checkboxes label:has(input:checked) {
-        background: #2d6a4f;
-        color: #fff;
-        border-color: #2d6a4f;
+      background: var(--moss);
+      color: #fff;
+      border-color: var(--moss);
     }
 
-    /* Кнопка скидання */
     #reset-filters {
-        width: 100%;
-        margin-top: 16px;
-        padding: 8px;
-        font-size: 0.82rem;
-        font-weight: 600;
-        background: #fff;
-        color: #888;
-        border: 1.5px solid #ccc;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    #reset-filters:hover { border-color: #999; color: #555; background: #f9f9f9; }
-
-    #map {
-      height: 700px;
       width: 100%;
-      margin-top: 320px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      margin-top: 14px;
+      padding: 8px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      background: #fff;
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #reset-filters:hover { border-color: var(--bark); color: var(--bark); }
+
+    /* ── Map ── */
+    #map {
+      height: calc(100vh - 64px);
+      width: 100%;
     }
 
+    /* ── Geolocation popup ── */
     #geolocation-popup {
       display: none;
       position: fixed;
@@ -224,28 +368,93 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: #f5f5f5;
-      border: 2px solid #4caf50;
-      padding: 20px 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      background: #fff;
+      border: 1.5px solid var(--border);
+      padding: 2rem 2.2rem;
+      border-radius: 14px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
       z-index: 3000;
       text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--forest);
     }
-    #geolocation-popup .buttons { margin-top: 15px; }
-    #geolocation-popup button {
-      padding: 10px 20px;
-      margin: 0 10px;
-      font-size: 16px;
+
+    #geolocation-popup p {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+
+    #geolocation-popup p.sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+
+    #geolocation-popup .buttons { display: flex; justify-content: center; gap: 0.8rem; margin-bottom: 0.8rem; }
+
+    #yes-button, #no-button {
+      padding: 0.65rem 1.6rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      background-color: #4caf50;
-      color: white;
-      transition: background-color 0.2s;
+      transition: all 0.2s;
     }
-    #geolocation-popup button:hover { background-color: #45a049; }
+    #yes-button { background: var(--moss); color: #fff; }
+    #yes-button:hover { background: var(--forest); }
+    #no-button { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+    #no-button:hover { border-color: var(--bark); color: var(--bark); }
 
+    #pick-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+      padding: 0.6rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: transparent;
+      color: var(--moss);
+      border: 1.5px solid var(--leaf);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #pick-button:hover { background: var(--moss); color: #fff; border-color: var(--moss); }
+
+    /* ── Pick location hint ── */
+    #pick-location-hint {
+      display: none;
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--forest);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      z-index: 4000;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: hintPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.6; }
+    }
+
+    body.picking-location #map { cursor: crosshair; }
+
+    /* ── User dot marker ── */
     .user-marker .dot {
       width: 19px;
       height: 19px;
@@ -329,15 +538,16 @@
       justify-content: center;
       flex-shrink: 0;
       font-size: 2rem;
-      color: #2d6a4f;
+      color: var(--moss);
     }
 
     .modal-header-info { flex: 1; min-width: 0; }
 
     .modal-title {
+      font-family: 'Fraunces', serif;
       font-size: 1.35rem;
-      font-weight: 700;
-      color: #1b4d1b;
+      font-weight: 600;
+      color: var(--forest);
       margin: 0 2rem 0.5rem 0;
       line-height: 1.25;
     }
@@ -348,13 +558,13 @@
       margin-bottom: 0.5rem;
     }
     .modal-organiser a {
-      color: #2d6a4f;
+      color: var(--moss);
       font-weight: 700;
       text-decoration: none;
       border-bottom: 1px solid transparent;
       transition: border-color 0.15s;
     }
-    .modal-organiser a:hover { border-bottom-color: #2d6a4f; }
+    .modal-organiser a:hover { border-bottom-color: var(--moss); }
 
     .modal-rating-label {
       font-size: 0.68rem;
@@ -371,11 +581,7 @@
       gap: 0.45rem;
     }
 
-    .stars {
-      display: flex;
-      gap: 1px;
-      line-height: 1;
-    }
+    .stars { display: flex; gap: 1px; line-height: 1; }
 
     .star-wrap {
       position: relative;
@@ -391,11 +597,7 @@
       white-space: nowrap;
     }
 
-    .rating-num {
-      font-size: 0.82rem;
-      color: #888;
-      font-weight: 600;
-    }
+    .rating-num { font-size: 0.82rem; color: #888; font-weight: 600; }
 
     .modal-route-panel {
       display: none;
@@ -405,8 +607,8 @@
       gap: 0.5rem;
       flex-shrink: 0;
       min-width: 118px;
-      background: #f0f9f0;
-      border: 1px solid #a5d6a7;
+      background: #f4f1eb;
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 0.8rem 1rem;
       text-align: center;
@@ -421,35 +623,34 @@
     }
 
     .modal-route-distance {
+      font-family: 'Fraunces', serif;
       font-size: 1.55rem;
-      font-weight: 800;
-      color: #1b4d1b;
+      font-weight: 600;
+      color: var(--forest);
       line-height: 1.1;
     }
 
-    .modal-route-sublabel {
-      font-size: 0.7rem;
-      color: #999;
-    }
+    .modal-route-sublabel { font-size: 0.7rem; color: #999; }
 
     .btn-show-route {
       display: flex;
       align-items: center;
       gap: 0.35rem;
       padding: 0.45rem 0.8rem;
-      background: #2d6a4f;
+      background: var(--moss);
       color: #fff;
       border: none;
       border-radius: 8px;
       font-size: 0.78rem;
       font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
       transition: background 0.2s, transform 0.15s;
       white-space: nowrap;
       margin-top: 0.2rem;
     }
-    .btn-show-route:hover { background: #1a3d2b; transform: translateY(-1px); }
-    .btn-show-route:disabled { background: #a5d6a7; cursor: default; transform: none; }
+    .btn-show-route:hover { background: var(--forest); transform: translateY(-1px); }
+    .btn-show-route:disabled { background: var(--mint); color: var(--moss); cursor: default; transform: none; }
 
     .modal-categories {
       display: flex;
@@ -468,13 +669,13 @@
       background: #e8f5e9;
       border: 1px solid #a5d6a7;
       font-size: 0.78rem;
-      color: #2d6a4f;
+      color: var(--moss);
       font-weight: 500;
     }
     .cat-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: #4caf50;
+      background: var(--leaf);
       flex-shrink: 0;
     }
 
@@ -486,32 +687,21 @@
       flex-wrap: wrap;
     }
 
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.82rem;
-      color: #555;
-    }
-
+    .meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: #555; }
     .meta-icon { font-size: 1rem; }
 
     .modal-description { padding: 1rem 1.6rem 0.5rem; }
 
     .modal-description h4 {
-      font-size: 0.75rem;
+      font-size: 0.68rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #999;
+      letter-spacing: 0.1em;
+      color: var(--muted);
       margin-bottom: 0.5rem;
       font-weight: 600;
     }
 
-    .modal-description p {
-      font-size: 0.9rem;
-      color: #444;
-      line-height: 1.65;
-    }
+    .modal-description p { font-size: 0.9rem; color: #444; line-height: 1.65; }
 
     .modal-footer {
       display: flex;
@@ -527,12 +717,13 @@
       align-items: center;
       gap: 0.4rem;
       padding: 0.6rem 1.1rem;
-      border: 1.5px solid #4caf50;
+      border: 1.5px solid var(--leaf);
       border-radius: 8px;
       background: transparent;
-      color: #2d6a4f;
+      color: var(--moss);
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -540,18 +731,19 @@
 
     .btn-detail {
       padding: 0.65rem 1.6rem;
-      background: #2d6a4f;
+      background: var(--moss);
       color: #fff;
       border: none;
       border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
       font-size: 0.9rem;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
       transition: background 0.2s, transform 0.15s;
       text-decoration: none;
       display: inline-block;
     }
-    .btn-detail:hover { background: #1a3d2b; transform: translateY(-1px); }
+    .btn-detail:hover { background: var(--forest); transform: translateY(-1px); }
 
     .modal-registered-badge {
       display: inline-flex;
@@ -559,7 +751,7 @@
       gap: 0.3rem;
       padding: 0.25rem 0.7rem;
       background: #e8f5e9;
-      border: 1.5px solid #2ecc71;
+      border: 1.5px solid var(--leaf);
       border-radius: 999px;
       font-size: 0.75rem;
       font-weight: 700;
@@ -567,144 +759,157 @@
       margin-bottom: 0.4rem;
     }
 
-    #pick-location-hint {
-      display: none;
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1b4d1b;
-      color: #fff;
-      font-size: 0.95rem;
+    /* ── Expired popup ── */
+    #expired-popup-inner {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    }
+    #expired-popup-inner h2 {
+      font-family: 'Fraunces', serif;
+      color: var(--forest);
+      margin: 0 0 0.5rem;
+      font-size: 1.4rem;
       font-weight: 600;
-      padding: 0.7rem 1.4rem;
-      border-radius: 999px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      z-index: 4000;
-      pointer-events: none;
-      white-space: nowrap;
-      animation: hintPulse 1.8s ease-in-out infinite;
     }
-    @keyframes hintPulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.6; }
+    #expired-popup-inner p { color: var(--muted); margin-bottom: 1.5rem; font-size: 0.92rem; }
+    #expired-popup-inner a {
+      display: block;
+      margin-bottom: 8px;
+      padding: 13px 24px;
+      background: var(--moss);
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s;
     }
-
-    body.picking-location #map { cursor: crosshair; }
-
-    #pick-button {
-      background-color: #8e24aa !important;
-      font-size: 13px !important;
-      padding: 8px 14px !important;
-      margin-top: 8px !important;
-    }
-    #pick-button:hover { background-color: #6a1b9a !important; }
+    #expired-popup-inner a:hover { background: var(--forest); }
 
     @media (max-width: 900px) {
-      #our-name { font-size: 72px; left: 16px; top: 8px; }
       #event-modal { width: 98vw; }
       .modal-route-distance { font-size: 1.2rem; }
+      .topbar { padding: 0 1.2rem; }
+      .topbar-right { gap: 0.5rem; }
+      .btn-action span, .btn-filter span, .btn-search span { display: none; }
     }
   </style>
 </head>
 
 <body>
 
-  <h1 id="our-name">Volungo</h1>
+  <!-- ── Topbar ── -->
+  <nav class="topbar">
+    <a class="wordmark" href="#">Volun<span>go</span></a>
 
-  {% if request.user.is_authenticated %}
-  <a href="{% url 'profile' request.user.username %}" id="profile-button" title="Ваш профіль">
-    {{ request.user.username|first|upper }}
-  </a>
-  {% else %}
-  <button id="profile-button" title="Ваш профіль">U</button>
-  {% endif %}
+    <div class="topbar-right">
+      <button id="create-button" class="btn-action btn-create"
+        onclick="window.location.href='{% url 'create_event' %}'">
+        + Створити подію
+      </button>
 
-  <div class="actions-wrapper">
-    <div id="actions">
-      <button id="create-button" class="action-btn"
-        onclick="window.location.href='{% url 'create_event' %}'">+ Створити подію</button>
-      <button id="donation-button" class="action-btn">$ Зробити донат</button>
+      <button id="donation-button" class="btn-action btn-donate">
+        $ Зробити донат
+      </button>
+
+      <div class="search-wrapper" id="search-wrapper">
+        <div class="search-input-wrap">
+          <input type="text" id="search-input" placeholder="Назва події…" autocomplete="off">
+          <button id="search-button" class="btn-search" title="Пошук">🔍</button>
+        </div>
+        <div id="search-dropdown"></div>
+      </div>
 
       <div class="filters-container">
-        <button id="filters-button" class="action-btn">> Фільтрувати</button>
+        <button id="filters-button" class="btn-filter">
+          ⚙ Фільтрувати
+        </button>
 
         <div id="filters">
-            <div class="filter-section">
-                <div class="filter-section-title">📍 Відстань від вас</div>
-                <div id="dist-no-location">⚠ Спочатку вкажіть вашу точку</div>
-                <div class="filter-dist-row">
-                    <button class="dist-btn" data-km="2">до 2 км</button>
-                    <button class="dist-btn" data-km="5">до 5 км</button>
-                    <button class="dist-btn" data-km="10">до 10 км</button>
-                    <button class="dist-btn" data-km="20">до 20 км</button>
-                    <button class="dist-btn" data-km="50">до 50 км</button>
-                </div>
+          <div class="filter-section">
+            <div class="filter-section-title">📍 Відстань від вас</div>
+            <div id="dist-no-location">⚠ Спочатку вкажіть вашу точку</div>
+            <div class="filter-dist-row">
+              <button class="dist-btn" data-km="2">до 2 км</button>
+              <button class="dist-btn" data-km="5">до 5 км</button>
+              <button class="dist-btn" data-km="10">до 10 км</button>
+              <button class="dist-btn" data-km="20">до 20 км</button>
+              <button class="dist-btn" data-km="50">до 50 км</button>
             </div>
+          </div>
 
-            <div class="filter-section">
-                <div class="filter-section-title">⭐ Мін. рейтинг організатора</div>
-                <div class="rating-slider-row">
-                    <input type="range" id="rating-slider" min="0" max="5" step="0.5" value="0">
-                    <span id="rating-slider-value">Будь-який</span>
-                </div>
+          <div class="filter-section">
+            <div class="filter-section-title">⭐ Мін. рейтинг організатора</div>
+            <div class="rating-slider-row">
+              <input type="range" id="rating-slider" min="0" max="5" step="0.5" value="0">
+              <span id="rating-slider-value">Будь-який</span>
             </div>
+          </div>
 
-            <div class="filter-section">
-                <div class="filter-section-title">🏷️ Категорії</div>
-                <div class="cat-checkboxes">
-                    <label><input type="checkbox" value="animals">🐾 Допомога тваринам</label>
-                    <label><input type="checkbox" value="nets">🪢 'Плетіння сіток для армії'</label>
-                    <label><input type="checkbox" value="shelter">🏠 'Допомога в пансіонаті'</label>
-                    <label><input type="checkbox" value="food">🍲 'Приготування теплих страв',</label>
-                    <label><input type="checkbox" value="cleanup">🧹 'Прибирання території'</label>
-                    <label><input type="checkbox" value="children">👧 'Робота з дітьми',</label>
-                    <label><input type="checkbox" value="elderly">👴 'Допомога літнім людям'</label>
-                    <label><input type="checkbox" value="medical">🏥 'Медична допомога'</label>
-                    <label><input type="checkbox" value="transport">🚗 'Транспортна допомога'</label>
-                    <label><input type="checkbox" value="other">✳️ Інше</label>
-                </div>
+          <div class="filter-section">
+            <div class="filter-section-title">🏷️ Категорії</div>
+            <div class="cat-checkboxes">
+              <label><input type="checkbox" value="animals">🐾 Допомога тваринам</label>
+              <label><input type="checkbox" value="nets">🪢 Плетіння сіток для армії</label>
+              <label><input type="checkbox" value="shelter">🏠 Допомога в пансіонаті</label>
+              <label><input type="checkbox" value="food">🍲 Приготування теплих страв</label>
+              <label><input type="checkbox" value="cleanup">🧹 Прибирання території</label>
+              <label><input type="checkbox" value="children">👧 Робота з дітьми</label>
+              <label><input type="checkbox" value="elderly">👴 Допомога літнім людям</label>
+              <label><input type="checkbox" value="medical">🏥 Медична допомога</label>
+              <label><input type="checkbox" value="transport">🚗 Транспортна допомога</label>
+              <label><input type="checkbox" value="other">✳️ Інше</label>
             </div>
+          </div>
 
-            <button id="reset-filters">✕ Скинути всі фільтри</button>
+          <button id="reset-filters">✕ Скинути всі фільтри</button>
         </div>
       </div>
-    </div>
-  </div>
 
-  <button id="search-button">Знайти найближчі</button>
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'profile' request.user.username %}" class="btn-profile" title="Ваш профіль">
+        {{ request.user.username|first|upper }}
+      </a>
+      {% else %}
+      <div class="btn-profile" title="Ваш профіль">U</div>
+      {% endif %}
+    </div>
+  </nav>
 
   <!-- Expired events popup -->
   {% if expired_events %}
   <div id="expired-popup" style="display:flex; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:5000; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:16px; padding:2rem; max-width:480px; width:90%; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+    <div id="expired-popup-inner">
       <div style="font-size:2.5rem; margin-bottom:0.8rem;">⏰</div>
-      <h2 style="color:#1b4d1b; margin:0 0 0.5rem; font-size:1.4rem;">Час підвести підсумки!</h2>
-      <p style="color:#666; margin-bottom:1.5rem; font-size:0.92rem;">
+      <h2>Час підвести підсумки!</h2>
+      <p>
         Термін закінчився для:
         {% for e in expired_events %}
           <strong>{{ e.name }}</strong>{% if not forloop.last %}, {% endif %}
         {% endfor %}
       </p>
       {% for e in expired_events %}
-      <a href="{% url 'event_resolve' e.id %}"
-         style="display:block; margin-bottom:8px; padding:13px 24px; background:#2d6a4f; color:#fff; border-radius:10px; font-weight:700; text-decoration:none; font-size:0.95rem;">
-        🏁 Завершити "{{ e.name }}"
-      </a>
+      <a href="{% url 'event_resolve' e.id %}">🏁 Завершити "{{ e.name }}"</a>
       {% endfor %}
     </div>
   </div>
   {% endif %}
 
+  <!-- Geolocation popup -->
   <div id="geolocation-popup" role="dialog" aria-modal="true">
     <p>Надати свої координати?</p>
+    <p class="sub">Це потрібно для відображення відстані до подій</p>
     <div class="buttons">
       <button id="yes-button">Так</button>
       <button id="no-button">Ні</button>
     </div>
-    <div style="margin-top:10px;">
-      <button id="pick-button">📍 Вибрати точку на карті</button>
-    </div>
+    <button id="pick-button">📍 Вибрати точку на карті</button>
   </div>
 
   <div id="pick-location-hint">📍 Клікніть на карту щоб вибрати вашу точку</div>
@@ -825,14 +1030,12 @@
     ];
     events = events.filter(e => e.lat !== null && e.lng !== null);
 
-    // ── Стан фільтрів ──
     const filters = {
-      maxDistKm:  null,   // число або null
-      minRating:  null,   // число або null
-      categories: [],     // масив рядків, порожній = всі
+      maxDistKm:  null,
+      minRating:  null,
+      categories: [],
     };
 
-    // ── Формула Гаверсина — відстань між двома точками у км ──
     function haversineKm(lat1, lng1, lat2, lng2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -844,12 +1047,10 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    // ── Застосувати фільтри — показати/сховати маркери ──
     function applyFilters() {
       markers.forEach(({ evt, marker }) => {
         let visible = true;
 
-        // Фільтр за відстанню
         if (filters.maxDistKm !== null) {
           if (!userCoords) {
             visible = false;
@@ -859,13 +1060,11 @@
           }
         }
 
-        // Фільтр за рейтингом організатора
         if (visible && filters.minRating !== null) {
           const r = ORGANISER_RATINGS[evt.organiser];
           if (r === null || r === undefined || r < filters.minRating) visible = false;
         }
 
-        // Фільтр за категоріями (подія повинна мати хоча б одну з вибраних)
         if (visible && filters.categories.length > 0) {
           const evtCats = Array.isArray(evt.categories) ? evt.categories : [];
           const match = filters.categories.some(c => evtCats.includes(c));
@@ -880,7 +1079,6 @@
       });
     }
 
-    // ── half-star renderer ──
     function renderStars(rating) {
       const container = document.getElementById('modal-stars');
       const numEl     = document.getElementById('modal-rating-num');
@@ -1048,7 +1246,6 @@
       buildRouteOnMap(userCoords.lat, userCoords.lng, currentEvt.lat, currentEvt.lng);
     });
 
-    // ── Маркери: зберігаємо в масиві для фільтрації ──
     const markers = [];
     events.forEach(evt => {
       const marker = evt.registered
@@ -1058,20 +1255,16 @@
       markers.push({ evt, marker });
     });
 
-    // ── Логіка кнопок фільтрів ──
-
-    // Відстань
+    // ── Filter buttons ──
     document.querySelectorAll('.dist-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const km = parseFloat(this.dataset.km);
         if (!userCoords) {
-          // показуємо підказку і нічого не робимо
           document.getElementById('dist-no-location').style.display = 'block';
           return;
         }
         document.getElementById('dist-no-location').style.display = 'none';
         if (filters.maxDistKm === km) {
-          // повторний клік — скинути
           filters.maxDistKm = null;
           this.classList.remove('active');
         } else {
@@ -1083,7 +1276,6 @@
       });
     });
 
-    // Рейтинг — слайдер
     const ratingSlider = document.getElementById('rating-slider');
     const ratingValue  = document.getElementById('rating-slider-value');
     ratingSlider.addEventListener('input', function() {
@@ -1098,7 +1290,6 @@
       applyFilters();
     });
 
-    // Категорії
     document.querySelectorAll('.cat-checkboxes input[type=checkbox]').forEach(cb => {
       cb.addEventListener('change', function() {
         if (this.checked) {
@@ -1110,7 +1301,6 @@
       });
     });
 
-    // Скинути всі фільтри
     document.getElementById('reset-filters').addEventListener('click', function() {
       filters.maxDistKm  = null;
       filters.minRating  = null;
@@ -1123,7 +1313,7 @@
       applyFilters();
     });
 
-    // ── geolocation ──
+    // ── Geolocation ──
     const geoPopup = document.getElementById("geolocation-popup");
     window.addEventListener('load', () => {
       if ("geolocation" in navigator) geoPopup.style.display = "block";
@@ -1138,7 +1328,6 @@
           window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
           map.setView([lat, lng], 15);
           userCoords = { lat, lng };
-          // якщо є активний фільтр відстані — оновлюємо
           if (filters.maxDistKm !== null) applyFilters();
         },
         () => alert("Не вдалося отримати геолокацію")
@@ -1168,7 +1357,6 @@
         pickingLocation = false;
         pickHint.style.display = 'none';
         document.body.classList.remove('picking-location');
-        // якщо є активний фільтр відстані — оновлюємо
         if (filters.maxDistKm !== null) applyFilters();
         return;
       }
@@ -1178,15 +1366,94 @@
       }
     });
 
-    // ── filters toggle ──
+    // ── Search ──
+    const searchInput    = document.getElementById('search-input');
+    const searchBtn      = document.getElementById('search-button');
+    const searchDropdown = document.getElementById('search-dropdown');
+
+    // Toggle expand input on button click
+    searchBtn.addEventListener('click', function() {
+      const expanded = searchInput.classList.toggle('expanded');
+      if (expanded) {
+        searchInput.focus();
+      } else {
+        searchInput.value = '';
+        searchDropdown.style.display = 'none';
+      }
+    });
+
+    function highlightMatch(text, query) {
+      if (!query) return text;
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return text;
+      return text.slice(0, idx)
+        + `<span class="search-item-highlight">${text.slice(idx, idx + query.length)}</span>`
+        + text.slice(idx + query.length);
+    }
+
+    function renderDropdown(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        searchDropdown.style.display = 'none';
+        return;
+      }
+
+      const matches = events.filter(e => e.name.toLowerCase().includes(q)).slice(0, 8);
+
+      if (matches.length === 0) {
+        searchDropdown.innerHTML = '<div class="search-no-results">Нічого не знайдено</div>';
+      } else {
+        searchDropdown.innerHTML = matches.map(e => {
+          const catLabels = (Array.isArray(e.categories) ? e.categories : [])
+            .map(c => CATEGORY_LABELS[c] || c).join(', ') || 'Без категорії';
+          return `<div class="search-dropdown-item" data-id="${e.id}">
+            <span class="search-item-name">${highlightMatch(e.name, query.trim())}</span>
+            <span class="search-item-meta">${catLabels}${e.datetime ? ' · ' + e.datetime : ''}</span>
+          </div>`;
+        }).join('');
+
+        searchDropdown.querySelectorAll('.search-dropdown-item').forEach(item => {
+          item.addEventListener('click', function() {
+            const id = parseInt(this.dataset.id);
+            const evt = events.find(e => e.id === id);
+            if (!evt) return;
+            searchDropdown.style.display = 'none';
+            searchInput.value = evt.name;
+            openModal(evt);
+          });
+        });
+      }
+
+      searchDropdown.style.display = 'block';
+    }
+
+    searchInput.addEventListener('input', function() {
+      renderDropdown(this.value);
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        searchDropdown.style.display = 'none';
+        searchInput.classList.remove('expanded');
+        searchInput.value = '';
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!document.getElementById('search-wrapper').contains(e.target)) {
+        searchDropdown.style.display = 'none';
+      }
+    });
+
+    // ── Filters toggle ──
     const filtersBtn = document.getElementById('filters-button');
     const filtersDiv = document.getElementById('filters');
     let filtersOpen  = false;
     filtersBtn.addEventListener('click', function() {
       filtersOpen = !filtersOpen;
-      filtersBtn.innerText = filtersOpen ? "⌄ Фільтрувати" : "> Фільтрувати";
+      filtersBtn.textContent = filtersOpen ? "✕ Закрити" : "⚙ Фільтрувати";
       filtersDiv.style.display = filtersOpen ? 'block' : 'none';
-      // Якщо немає userCoords — блокуємо кнопки відстані
       if (filtersOpen) {
         document.querySelectorAll('.dist-btn').forEach(b => {
           b.disabled = !userCoords;
