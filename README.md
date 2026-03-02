@@ -2,7 +2,7 @@
 
 ---
 
-## About the Project
+**About the Project**
 
 Volungo is a modern web platform designed to connect volunteers with social organizations and nonprofit initiatives. It brings the power of social networking to the volunteer and NGO ecosystem, enabling meaningful interactions, project discovery, community growth, and real-world impact.
 
@@ -14,7 +14,7 @@ The platform is focused on building a socially connected volunteer community whe
 
 ---
 
-## Key Features
+**Key Features**
 
 **Role-Based Authentication:** Secure user authentication with distinct flows for Volunteers and Organizations.
 **Profile & Activity Management:** Dedicated user profiles with avatars, personal info, and tracking of volunteer activities.
@@ -27,7 +27,7 @@ The platform is focused on building a socially connected volunteer community whe
 
 ---
 
-## Tech Stack
+**Tech Stack**
 
 Volungo is built using a robust and scalable stack, leveraging the latest version of Django (6.0+).
 
@@ -41,7 +41,7 @@ Volungo is built using a robust and scalable stack, leveraging the latest versio
 
 ---
 
-## Project Structure
+**Project Structure**
 
 The project follows an advanced Django architectural pattern, separating configuration (`core`) from business logic apps (`volungo`).
 
