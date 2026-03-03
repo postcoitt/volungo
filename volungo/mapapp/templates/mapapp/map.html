@@ -876,6 +876,19 @@
       <a href="{% url 'profile' request.user.username %}" class="btn-profile" title="Ваш профіль">
         {{ request.user.username|first|upper }}
       </a>
+      <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" title="Вийти" style="
+          width:40px; height:40px; border-radius:50%;
+          background:transparent; border:1px solid rgba(183,228,199,0.4);
+          color:rgba(183,228,199,0.85); font-size:1.1rem; cursor:pointer;
+          display:flex; align-items:center; justify-content:center; padding-bottom: 3px;
+          transition:all 0.2s; flex-shrink:0;
+        " onmouseover="this.style.background='rgba(192,57,43,0.25)';this.style.borderColor='#e74c3c';this.style.color='#e74c3c';"
+            onmouseout="this.style.background='transparent';this.style.borderColor='rgba(183,228,199,0.4)';this.style.color='rgba(183,228,199,0.85)';">
+          ⏻
+        </button>
+      </form>
       {% else %}
       <div class="btn-profile" title="Ваш профіль">U</div>
       {% endif %}
