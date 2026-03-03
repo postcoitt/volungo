@@ -112,12 +112,12 @@
             </form>
         {% else %}
             <div class="avatar-container" style="cursor:default;">
-                <div class="avatar-border">
-                    {% if profile.avatar %}<img src="{{ profile.avatar.url }}" alt="Аватар">
-                    {% else %}<img src="https://ui-avatars.com/api/?name={{ profile_user.username }}&background=064e3b&color=fff&size=180" alt="Аватар">{% endif %}
-                </div>
+            <div class="avatar-border">
+                {% if profile.avatar_url %}<img src="{{ profile.avatar_url }}" alt="Аватар">
+                {% else %}<img src="https://ui-avatars.com/api/?name={{ profile_user.username }}&background=064e3b&color=fff&size=180" alt="Аватар">{% endif %}
             </div>
-        {% endif %}
+            </div>
+            {% endif %}
 
         <div class="level-tag">{{ profile.level }}</div>
         <div class="user-stats">
