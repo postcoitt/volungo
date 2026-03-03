@@ -178,7 +178,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="action" value="remove_friend">
                     <button type="submit" class="btn-friend btn-friend-friends"
-                            onmouseover="this.textContent='✕ Видалити з друзів'"
+                            onmouseover="this.textContent='✕ Видалити'"
                             onmouseout="this.textContent='✓ У друзях'">✓ У друзях</button>
                 </form>
             {% endif %}
@@ -187,8 +187,9 @@
             <a href="{% url 'friends_list' profile_user.username %}" class="btn-friends-link">
                 👥 Друзі <span style="font-size:12px; opacity:0.7;">({{ friends_count }})</span>
             </a>
-
-            <button class="btn btn-outline" onclick="document.getElementById('review-form').style.display='block'">Додати відгук</button>
+            {% if user.is_authenticated and user != profile_user %}
+                <button class="btn btn-outline" onclick="document.getElementById('review-form').style.display='block'">Додати відгук</button>
+            {% endif %}
         </div>
 
         <div id="review-form" style="display:none; background:#fff; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">

@@ -124,3 +124,5 @@ USE_TZ = True
 STATIC_URL = 'static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/map/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
