@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Volungo – Join Us</title>
+  <title>Volungo – Реєстрація</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +27,6 @@
       overflow: hidden;
     }
 
-    /* ── left panel ── */
     .panel-left {
       display: flex;
       align-items: center;
@@ -38,7 +37,6 @@
       overflow-y: auto;
     }
 
-    /* subtle corner accents */
     .panel-left::before,
     .panel-left::after {
       content: '';
@@ -93,7 +91,6 @@
       margin-top: 0.4rem;
     }
 
-    /* two-column grid for name fields */
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -134,7 +131,6 @@
       box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
     }
 
-    /* password strength bar */
     .strength-bar {
       display: flex;
       gap: 4px;
@@ -157,7 +153,6 @@
       margin-top: 0.25rem;
     }
 
-    /* Django form error messages */
     .errorlist {
       list-style: none;
       margin-top: 0.35rem;
@@ -167,7 +162,6 @@
       color: #c0392b;
     }
 
-    /* terms checkbox */
     .checkbox-group {
       display: flex;
       align-items: flex-start;
@@ -239,7 +233,6 @@
     }
     .signin-row a:hover { text-decoration: underline; }
 
-    /* ── right decorative panel ── */
     .panel-right {
       position: relative;
       background: var(--forest);
@@ -307,7 +300,6 @@
       margin-bottom: 3rem;
     }
 
-    /* benefit list */
     .benefits { display: flex; flex-direction: column; gap: 1.4rem; }
 
     .benefit {
@@ -329,7 +321,6 @@
       font-size: 1rem;
     }
 
-    .benefit-text {}
     .benefit-title {
       font-family: 'Fraunces', serif;
       font-weight: 600;
@@ -344,7 +335,6 @@
       line-height: 1.5;
     }
 
-    /* divider */
     .divider {
       display: flex;
       align-items: center;
@@ -357,7 +347,6 @@
       content: ''; flex: 1; height: 1px; background: #ddd9d0;
     }
 
-    /* responsive */
     @media (max-width: 700px) {
       body { grid-template-columns: 1fr; overflow: auto; }
       .panel-right { display: none; }
@@ -367,32 +356,31 @@
 </head>
 <body>
 
-  <!-- ── Left form panel ── -->
   <div class="panel-left">
     <div class="form-card">
       <div class="form-header">
-        <div class="form-eyebrow">New here?</div>
-        <div class="form-title">Create your<br>account</div>
-        <div class="form-subtitle">Start making a difference today.</div>
+        <div class="form-eyebrow">Вперше тут?</div>
+        <div class="form-title">Створити<br>акаунт</div>
+        <div class="form-subtitle">Почни робити добро вже сьогодні.</div>
       </div>
 
       <form method="POST" action="{% url 'register' %}">
         {% csrf_token %}
 
         <div class="form-group">
-          <label for="{{ form.username.id_for_label }}">Username</label>
+          <label for="{{ form.username.id_for_label }}">Ім'я користувача</label>
           {{ form.username }}
           {{ form.username.errors }}
         </div>
 
         <div class="form-group">
-          <label for="{{ form.email.id_for_label }}">Email address</label>
+          <label for="{{ form.email.id_for_label }}">Електронна пошта</label>
           {{ form.email }}
           {{ form.email.errors }}
         </div>
 
         <div class="form-group">
-          <label for="{{ form.password1.id_for_label }}">Password</label>
+          <label for="{{ form.password1.id_for_label }}">Пароль</label>
           {{ form.password1 }}
           {{ form.password1.errors }}
           <div class="strength-bar" id="strengthBar">
@@ -405,7 +393,7 @@
         </div>
 
         <div class="form-group">
-          <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+          <label for="{{ form.password2.id_for_label }}">Підтвердити пароль</label>
           {{ form.password2 }}
           {{ form.password2.errors }}
         </div>
@@ -420,19 +408,18 @@
 
         <div class="checkbox-group">
           <input type="checkbox" id="terms" name="terms" required />
-          <span>I agree to Volungo's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+          <span>Я погоджуюсь з <a href="#">Умовами використання</a> та <a href="#">Політикою конфіденційності</a> Volungo</span>
         </div>
 
-        <button type="submit" class="btn-register">Create account</button>
+        <button type="submit" class="btn-register">Створити акаунт</button>
       </form>
 
       <div class="signin-row">
-        Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        Вже є акаунт? <a href="{% url 'login' %}">Увійти</a>
       </div>
     </div>
   </div>
 
-  <!-- ── Right decorative panel ── -->
   <div class="panel-right">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -443,35 +430,35 @@
 
     <div class="panel-right-content">
       <div class="wordmark">Volun<span>go</span></div>
-      <div class="tagline">Volunteering, wherever you are.</div>
+      <div class="tagline">Волонтерство, де б ти не був.</div>
 
       <div class="benefits">
         <div class="benefit">
           <div class="benefit-icon">🌍</div>
           <div class="benefit-text">
-            <div class="benefit-title">Find missions near you</div>
-            <div class="benefit-desc">Browse hundreds of local and remote opportunities matched to your skills and schedule.</div>
+            <div class="benefit-title">Знайди події поруч</div>
+            <div class="benefit-desc">Переглядай сотні місцевих та онлайн можливостей підібраних під твої навички.</div>
           </div>
         </div>
         <div class="benefit">
           <div class="benefit-icon">🤝</div>
           <div class="benefit-text">
-            <div class="benefit-title">Join a community</div>
-            <div class="benefit-desc">Connect with 4,200+ volunteers who share your passion for positive change.</div>
+            <div class="benefit-title">Приєднуйся до спільноти</div>
+            <div class="benefit-desc">Спілкуйся з 4200+ волонтерами які прагнуть позитивних змін.</div>
           </div>
         </div>
         <div class="benefit">
           <div class="benefit-icon">📋</div>
           <div class="benefit-text">
-            <div class="benefit-title">Track your impact</div>
-            <div class="benefit-desc">Log your hours, collect references, and build a verified volunteer résumé.</div>
+            <div class="benefit-title">Відстежуй свій внесок</div>
+            <div class="benefit-desc">Записуй години, збирай відгуки та будуй волонтерське резюме.</div>
           </div>
         </div>
         <div class="benefit">
           <div class="benefit-icon">🔔</div>
           <div class="benefit-text">
-            <div class="benefit-title">Never miss a mission</div>
-            <div class="benefit-desc">Get alerts for new opportunities that fit your profile — always free, always relevant.</div>
+            <div class="benefit-title">Не пропускай події</div>
+            <div class="benefit-desc">Отримуй сповіщення про нові події що відповідають твоєму профілю.</div>
           </div>
         </div>
       </div>
@@ -479,7 +466,6 @@
   </div>
 
   <script>
-    // Password strength indicator
     const pwInput = document.getElementById('id_password1');
     const segments = [
       document.getElementById('seg1'),
@@ -498,9 +484,8 @@
         if (/[0-9]/.test(val)) score++;
         if (/[^A-Za-z0-9]/.test(val)) score++;
 
-        const classes = ['active-weak', 'active-fair', 'active-fair', 'active-strong'];
-        const labels  = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-        const cls     = score <= 1 ? 'active-weak' : score <= 2 ? 'active-fair' : 'active-strong';
+        const labels = ['', 'Слабкий', 'Середній', 'Добрий', 'Надійний'];
+        const cls = score <= 1 ? 'active-weak' : score <= 2 ? 'active-fair' : 'active-strong';
 
         segments.forEach((seg, i) => {
           seg.className = 'strength-segment';

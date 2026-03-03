@@ -136,9 +136,11 @@ def event_detail_view(request, event_id):
 @login_required
 def register_for_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    if request.user == event.organiser:
+        return redirect('event_detail', event_id=event_id)
     reg, created = EventRegistration.objects.get_or_create(event=event, user=request.user)
     if not created:
-        reg.delete()  # toggle — if already registered, unregister
+        reg.delete()
     return redirect('event_detail', event_id=event_id)
 
 @login_required

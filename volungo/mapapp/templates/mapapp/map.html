@@ -863,8 +863,8 @@
         + Створити подію
       </button>
 
-      <button id="donation-button" class="btn-action btn-donate">
-        $ Зробити донат
+      <button id="location-button" class="btn-action btn-donate">
+        Змінити моє місцезнаходження
       </button>
 
       <div class="search-wrapper" id="search-wrapper">
@@ -1385,7 +1385,15 @@
     // ── Geolocation ──
     const geoPopup = document.getElementById("geolocation-popup");
     window.addEventListener('load', () => {
-      if ("geolocation" in navigator) geoPopup.style.display = "block";
+      const saved = sessionStorage.getItem('userCoords');
+      if (saved) {
+        const { lat, lng } = JSON.parse(saved);
+        userCoords = { lat, lng };
+        window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
+        map.setView([lat, lng], 15);
+      } else if ("geolocation" in navigator) {
+        geoPopup.style.display = "block";
+      }
     });
 
     document.getElementById("yes-button").addEventListener("click", () => {
@@ -1397,6 +1405,7 @@
           window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
           map.setView([lat, lng], 15);
           userCoords = { lat, lng };
+          sessionStorage.setItem('userCoords', JSON.stringify({ lat, lng }));
           if (filters.maxDistKm !== null) applyFilters();
         },
         () => alert("Не вдалося отримати геолокацію")
@@ -1405,6 +1414,10 @@
 
     document.getElementById("no-button").addEventListener("click", () => {
       geoPopup.style.display = "none";
+    });
+
+    document.getElementById("location-button").addEventListener("click", () => {
+      geoPopup.style.display = "block";
     });
 
     let pickingLocation = false;
@@ -1421,6 +1434,7 @@
       if (pickingLocation) {
         const { lat, lng } = e.latlng;
         userCoords = { lat, lng };
+        sessionStorage.setItem('userCoords', JSON.stringify({ lat, lng }));
         if (window.userMarker) map.removeLayer(window.userMarker);
         window.userMarker = L.marker([lat, lng], { icon: userAvatar }).addTo(map);
         pickingLocation = false;

@@ -95,6 +95,7 @@
             <div class="right-column">
                 <div class="card" style="padding: 25px;">
                     {% if request.user.is_authenticated %}
+                        {% if request.user != event.organiser %}
                         <form method="POST" action="{% url 'register_for_event' event.id %}">
                             {% csrf_token %}
                             {% if is_registered %}
@@ -105,8 +106,9 @@
                                 <button type="submit" class="btn-main">Я йду волонтерити!</button>
                             {% endif %}
                         </form>
+                        {% endif %}
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn-main" style="display:block; text-align:center; text-decoration:none;">Увійдіть щоб записатись</a>
+                        <a href="{% url 'login' %}" style="display:block; text-align:center; text-decoration:none; padding:12px; background:#f1c40f; color:#111; border-radius:30px; font-weight:700; font-size:14px;">Увійдіть щоб записатись</a>
                     {% endif %}
                     {% if request.user == event.organiser and not event.is_completed %}
                     <a href="{% url 'event_resolve' event.id %}"

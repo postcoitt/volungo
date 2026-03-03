@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Volungo – Sign In</title>
+  <title>Volungo – Вхід</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +27,6 @@
       overflow: hidden;
     }
 
-    /* ── left panel ── */
     .panel-left {
       position: relative;
       background: var(--forest);
@@ -38,7 +37,6 @@
       overflow: hidden;
     }
 
-    /* organic blob shapes */
     .blob {
       position: absolute;
       border-radius: 50%;
@@ -49,16 +47,13 @@
     .blob-2 { width: 280px; height: 280px; background: var(--leaf);  top: 40%;   left: 30%;  opacity: 0.2; }
     .blob-3 { width: 340px; height: 340px; background: var(--forest); bottom: -80px; right: -60px; opacity: 0.6; }
 
-    /* leaf grid pattern */
     .leaf-grid {
       position: absolute;
       inset: 0;
-      background-image:
-        radial-gradient(circle, rgba(82,183,136,0.12) 1px, transparent 1px);
+      background-image: radial-gradient(circle, rgba(82,183,136,0.12) 1px, transparent 1px);
       background-size: 32px 32px;
     }
 
-    /* big decorative circle */
     .deco-ring {
       position: absolute;
       width: 380px; height: 380px;
@@ -99,11 +94,7 @@
       margin-bottom: 2rem;
     }
 
-    .stat-row {
-      display: flex;
-      gap: 2rem;
-    }
-    .stat { }
+    .stat-row { display: flex; gap: 2rem; }
     .stat-num {
       font-family: 'Fraunces', serif;
       font-weight: 600;
@@ -120,7 +111,6 @@
       margin-top: 2px;
     }
 
-    /* ── right panel ── */
     .panel-right {
       display: flex;
       align-items: center;
@@ -130,7 +120,6 @@
       position: relative;
     }
 
-    /* subtle corner accents */
     .panel-right::before,
     .panel-right::after {
       content: '';
@@ -174,9 +163,7 @@
       letter-spacing: -0.02em;
     }
 
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
+    .form-group { margin-bottom: 1.2rem; }
 
     label {
       display: block;
@@ -208,7 +195,6 @@
       box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
     }
 
-    /* Django form error messages */
     .errorlist {
       list-style: none;
       margin-top: 0.35rem;
@@ -217,21 +203,6 @@
       font-size: 0.78rem;
       color: #c0392b;
     }
-
-    .form-footer-row {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 1.6rem;
-    }
-
-    .link {
-      font-size: 0.82rem;
-      color: var(--moss);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.2s;
-    }
-    .link:hover { border-color: var(--moss); }
 
     .btn-login {
       width: 100%;
@@ -274,7 +245,6 @@
     }
     .signup-row a:hover { text-decoration: underline; }
 
-    /* divider */
     .divider {
       display: flex;
       align-items: center;
@@ -287,7 +257,6 @@
       content: ''; flex: 1; height: 1px; background: #ddd9d0;
     }
 
-    /* responsive */
     @media (max-width: 700px) {
       body { grid-template-columns: 1fr; }
       .panel-left { display: none; }
@@ -296,7 +265,6 @@
 </head>
 <body>
 
-  <!-- ── Left decorative panel ── -->
   <div class="panel-left">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -307,43 +275,42 @@
 
     <div class="panel-left-content">
       <div class="wordmark">Volun<span>go</span></div>
-      <div class="tagline">Volunteering, wherever you are.</div>
+      <div class="tagline">Волонтерство, де б ти не був.</div>
       <div class="stat-row">
         <div class="stat">
           <div class="stat-num">4.2k</div>
-          <div class="stat-label">Volunteers</div>
+          <div class="stat-label">Волонтерів</div>
         </div>
         <div class="stat">
           <div class="stat-num">830</div>
-          <div class="stat-label">Missions</div>
+          <div class="stat-label">Подій</div>
         </div>
         <div class="stat">
           <div class="stat-num">61</div>
-          <div class="stat-label">Cities</div>
+          <div class="stat-label">Міст</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ── Right login panel ── -->
   <div class="panel-right">
     <div class="form-card">
       <div class="form-header">
-        <div class="form-eyebrow">Welcome back</div>
-        <div class="form-title">Sign in to<br>your account</div>
+        <div class="form-eyebrow">З поверненням</div>
+        <div class="form-title">Увійти до<br>акаунту</div>
       </div>
 
       <form method="POST" action="{% url 'login' %}">
         {% csrf_token %}
 
         <div class="form-group">
-          <label for="id_identifier">Username or Email</label>
-          <input type="text" name="identifier" id="id_identifier" placeholder="Username or Email" class="form-control" required>
+          <label for="id_identifier">Ім'я користувача або Email</label>
+          <input type="text" name="identifier" id="id_identifier" placeholder="Ім'я користувача або Email" required>
         </div>
 
         <div class="form-group">
-          <label for="id_password">Password</label>
-          <input type="password" name="password" id="id_password" placeholder="Password" class="form-control" required>
+          <label for="id_password">Пароль</label>
+          <input type="password" name="password" id="id_password" placeholder="Пароль" required>
         </div>
 
         {% if messages %}
@@ -352,13 +319,13 @@
           {% endfor %}
         {% endif %}
 
-        <button type="submit" class="btn-login">Sign in</button>
+        <button type="submit" class="btn-login">Увійти</button>
       </form>
 
-      <div class="divider">or</div>
+      <div class="divider">або</div>
 
       <div class="signup-row">
-        Don't have an account? <a href="{% url 'register' %}">Join Volungo</a>
+        Немає акаунту? <a href="{% url 'register' %}">Приєднатись</a>
       </div>
     </div>
   </div>
