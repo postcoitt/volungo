@@ -42,3 +42,18 @@ class EventRegistration(models.Model):
 
     def __str__(self):
         return f"{self.user.username} → {self.event.name}"
+
+
+
+class EventReview(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_reviews')
+    author  = models.ForeignKey(User, on_delete=models.CASCADE, related_name='event_reviews')
+    text    = models.TextField(verbose_name="Текст відгуку")
+    rating  = models.IntegerField(default=5, verbose_name="Оцінка (1-5)")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['event', 'author']
+
+    def __str__(self):
+        return f"Відгук на {self.event.name} від {self.author.username}"

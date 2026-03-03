@@ -97,11 +97,9 @@ class HelperReview(models.Model):
     text        = models.TextField(verbose_name="Текст відгуку")
     rating      = models.IntegerField(default=5, verbose_name="Оцінка (1-5)")
     created_at  = models.DateTimeField(auto_now_add=True)
-    event = models.ForeignKey(
-        'mapapp.Event',
-        on_delete=models.SET_NULL,
-        null=True, blank=True,
-        related_name='reviews'
-    )
+    event = models.ForeignKey('mapapp.Event', on_delete=models.SET_NULL, null=True, blank=True, related_name='helper_reviews')
     def __str__(self):
         return f"Відгук ({self.get_review_type_display()}) для {self.volunteer.username}"
+
+
+event = models.ForeignKey('mapapp.Event', on_delete=models.SET_NULL, null=True, blank=True, related_name='helper_reviews')

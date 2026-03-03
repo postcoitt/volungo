@@ -36,7 +36,7 @@ def _get_friend_status(viewer, target):
 
 
 def user_profile(request, username):
-    from mapapp.models import Event as MapEvent, EventRegistration
+    from mapapp.models import Event as MapEvent, EventRegistration, EventReview
     from django.db.models import Avg
 
     profile_user = get_object_or_404(User, username=username)
@@ -89,9 +89,7 @@ def user_profile(request, username):
     organised_events = MapEvent.objects.filter(organiser=profile_user).order_by('-datetime')
     organised_data = []
     for ev in organised_events:
-        avg = HelperReview.objects.filter(
-            event=ev, review_type='organizer'
-        ).aggregate(Avg('rating'))['rating__avg']
+        avg = EventReview.objects.filter(event=ev).aggregate(Avg('rating'))['rating__avg']
         organised_data.append({
             'event': ev,
             'avg_rating': round(avg, 1) if avg else None,
@@ -116,11 +114,23 @@ def user_profile(request, username):
             'review': review,
         })
 
-    avg_rating = HelperReview.objects.filter(volunteer=profile_user).aggregate(Avg('rating'))['rating__avg']
-    avg_rating = round(avg_rating, 1) if avg_rating else 0
+    avg_helper_rating = HelperReview.objects.filter(
+        volunteer=profile_user, review_type='helper'
+    ).aggregate(Avg('rating'))['rating__avg']
+    avg_helper_rating = round(avg_helper_rating, 1) if avg_helper_rating else 0
+
+    organiser_events = MapEvent.objects.filter(organiser=profile_user, is_completed=True)
+    event_avgs = []
+    for ev in organiser_events:
+        avg = EventReview.objects.filter(event=ev).aggregate(Avg('rating'))['rating__avg']
+        if avg:
+            event_avgs.append(avg)
+    avg_organiser_rating = round(sum(event_avgs) / len(event_avgs), 1) if event_avgs else 0
 
     context = {
-        'avg_rating': avg_rating,
+        'avg_rating': avg_helper_rating,
+        'avg_helper_rating': avg_helper_rating,
+        'avg_organiser_rating': avg_organiser_rating,
         'profile_user': profile_user,
         'profile': profile,
         'badges': profile.badges.all(),

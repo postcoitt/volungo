@@ -76,9 +76,11 @@ def create_event(request):
     form = EventForm()
     return render(request, 'mapapp/create_event.html', {'form': form})
 
+
 def event_detail_view(request, event_id):
-    from mapapp.models import Event as MapEvent, EventRegistration
+    from mapapp.models import Event as MapEvent, EventRegistration, EventReview
     from users.models import UserProfile
+    from django.db.models import Avg
 
     event = get_object_or_404(MapEvent, id=event_id)
     is_registered = False
@@ -89,10 +91,46 @@ def event_detail_view(request, event_id):
 
     organizer_profile, _ = UserProfile.objects.get_or_create(user=event.organiser)
 
+    organiser_events = MapEvent.objects.filter(organiser=event.organiser, is_completed=True)
+    event_avgs = []
+    for ev in organiser_events:
+        avg = EventReview.objects.filter(event=ev).aggregate(Avg('rating'))['rating__avg']
+        if avg:
+            event_avgs.append(avg)
+    avg_organiser_rating = round(sum(event_avgs) / len(event_avgs), 1) if event_avgs else None
+
+    # Відгуки волонтерів на подію
+    reviews = EventReview.objects.filter(event=event).select_related('author').order_by('-created_at')
+
+    # Чи вже залишив відгук поточний користувач
+    user_already_reviewed = False
+    if request.user.is_authenticated:
+        user_already_reviewed = EventReview.objects.filter(
+            event=event, author=request.user
+        ).exists()
+
+    # Обробка форми відгуку
+    if request.method == 'POST' and request.user.is_authenticated:
+        if is_registered and event.is_completed and not user_already_reviewed:
+            rating = int(request.POST.get('rating', 5))
+            text   = request.POST.get('text', '').strip()
+            if text and 1 <= rating <= 5:
+                EventReview.objects.create(
+                    event=event,
+                    author=request.user,
+                    rating=rating,
+                    text=text,
+                )
+        return redirect('event_detail', event_id=event_id)
+
     return render(request, 'users/events/event.html', {
         'event': event,
         'is_registered': is_registered,
         'organizer_profile': organizer_profile,
+        'reviews': reviews,
+        'user_already_reviewed': user_already_reviewed,
+        'avg_organiser_rating': avg_organiser_rating,
+        'can_review': is_registered and event.is_completed and not user_already_reviewed,
     })
 
 @login_required

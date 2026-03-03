@@ -146,26 +146,19 @@
                             style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:4px solid #f1c40f; margin:0 auto 15px auto; display:block;">
                     {% else %}
                         <div class="organizer-avatar">
-                            {{ event.organizer.username|make_list|first|upper }}
+                            {{ event.organiser.username|make_list|first|upper }}
                         </div>
                     {% endif %}
-                    <p class="organizer-name">{{ event.organizer.username }}</p>
+                    <p class="organizer-name">{{ event.organiser.username }}</p>
 
                     <div class="org-stats">
-                        <span>⭐ Рейтинг: <strong>{{ event.rating|default:"5.0" }}</strong></span>
-                        <span>⏳ Досвід: <strong>{{ event.organizer.profile.xp }} год.</strong></span>
-                        <div>
-                            <span class="stat-badge">{{ event.organizer.profile.level }}</span>
-                        </div>
+                        <span>⭐ Рейтинг: <strong>{% if avg_organiser_rating %}{{ avg_organiser_rating }}/5{% else %}Немає оцінок{% endif %}</strong></span>
+                        <div><span class="stat-badge">{{ organizer_profile.level }}</span></div>
                     </div>
 
-                    {% if event.organiser and event.organiser.username %}
-                        <a href="{% url 'user_profile' event.organiser.username %}" class="btn-profile">
-                            Перейти в профіль
-                        </a>
-                    {% else %}
-                        <span class="empty-info">Профіль організатора недоступний</span>
-                    {% endif %}
+                    <a href="{% url 'user_profile' event.organiser.username %}" class="btn-profile">
+                        Перейти в профіль
+                    </a>
                 </div>
             </div>
         </div>
@@ -173,20 +166,58 @@
 
             <!-- ── Reviews section ── -->
             {% if event.is_completed %}
-            <div style="margin-top:40px; margin-bottom:60px;">
+            <div style="max-width:1100px; margin:0 auto 60px; padding:0 20px;">
                 <div style="font-size:22px; font-weight:700; color:#1a6b46; border-bottom:2px solid #f1c40f; padding-bottom:6px; margin-bottom:20px; display:inline-block;">
-                    Відгуки про організатора цієї події
+                    Відгуки волонтерів про цю подію
                 </div>
 
-                {% with reviews=event.reviews.all %}
+                {% if can_review %}
+                <form method="POST" style="background:white; border-radius:12px; padding:20px 25px; margin-bottom:24px; border:1px solid #d1ded6;">
+                    {% csrf_token %}
+                    <div style="font-size:15px; font-weight:600; color:#1a6b46; margin-bottom:12px;">Залишити відгук</div>
+
+                    <div style="margin-bottom:12px;">
+                        <label style="font-size:13px; font-weight:600; color:#555; display:block; margin-bottom:6px;">Оцінка</label>
+                        <div style="display:flex; flex-direction:row-reverse; justify-content:flex-end; gap:4px;">
+                            {% for i in "54321" %}
+                            <input type="radio" id="rev_star{{ i }}" name="rating" value="{{ i }}" style="display:none;">
+                            <label for="rev_star{{ i }}" style="font-size:1.8rem; color:#ddd; cursor:pointer; transition:color 0.15s;"
+                                onmouseover="highlightStars({{ i }})" onmouseout="resetStars()">★</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:13px; font-weight:600; color:#555; display:block; margin-bottom:6px;">Коментар</label>
+                        <textarea name="text" rows="3" required
+                                style="width:100%; padding:10px; border:1.5px solid #d1ded6; border-radius:8px; font-family:inherit; font-size:14px; resize:vertical;"
+                                placeholder="Поділіться враженнями від події..."></textarea>
+                    </div>
+
+                    <button type="submit"
+                            style="background:#1a6b46; color:white; border:none; padding:10px 28px; border-radius:25px; font-size:14px; font-weight:700; cursor:pointer;">
+                        Відправити відгук
+                    </button>
+                </form>
+                {% endif %}
+
                 {% if reviews %}
                     {% for review in reviews %}
                     <div style="background:white; border-radius:12px; padding:20px 25px; margin-bottom:16px; border:1px solid #e8f5e9; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
                         <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-                            <img src="https://ui-avatars.com/api/?name={{ review.author.username }}&background=064e3b&color=fff&size=40"
-                                style="width:40px; height:40px; border-radius:50%; border:2px solid #f1c40f;">
+                            {% if review.author.profile.avatar_url %}
+                                <img src="{{ review.author.profile.avatar_url }}"
+                                    style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #f1c40f;">
+                            {% else %}
+                                <img src="https://ui-avatars.com/api/?name={{ review.author.username }}&background=064e3b&color=fff&size=40"
+                                    style="width:40px; height:40px; border-radius:50%; border:2px solid #f1c40f;">
+                            {% endif %}
                             <div>
-                                <strong style="color:#064e3b;">{{ review.author.username }}</strong>
+                                <strong style="color:#064e3b;">
+                                    <a href="{% url 'user_profile' review.author.username %}" style="color:#064e3b; text-decoration:none;">
+                                        {{ review.author.username }}
+                                    </a>
+                                </strong>
                                 <div style="font-size:12px; color:#999;">{{ review.created_at|date:"d.m.Y" }}</div>
                             </div>
                             <div style="margin-left:auto;">
@@ -202,11 +233,29 @@
                 {% else %}
                     <p style="color:#999; font-style:italic;">Ще немає відгуків про цю подію.</p>
                 {% endif %}
-                {% endwith %}
             </div>
             {% endif %}
 
             </div>
+
+<script>
+function highlightStars(n) {
+    document.querySelectorAll('[id^="rev_star"]').forEach(input => {
+        const label = document.querySelector(`label[for="${input.id}"]`);
+        label.style.color = parseInt(input.value) <= n ? '#f5a623' : '#ddd';
+    });
+}
+function resetStars() {
+    const checked = document.querySelector('[name="rating"]:checked');
+    document.querySelectorAll('[id^="rev_star"]').forEach(input => {
+        const label = document.querySelector(`label[for="${input.id}"]`);
+        label.style.color = checked && parseInt(input.value) <= parseInt(checked.value) ? '#f5a623' : '#ddd';
+    });
+}
+document.querySelectorAll('[id^="rev_star"]').forEach(input => {
+    input.addEventListener('change', resetStars);
+});
+</script>
 
 </body>
 </html>
