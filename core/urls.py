@@ -5,9 +5,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('users.urls')), # Твій підключений додаток
+    path('map/', include('mapapp.urls')),  
+    path('', include('users.urls')),
 ]
 
-# Цей рядок дозволяє показувати картинки на сайті
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

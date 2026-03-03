@@ -452,7 +452,86 @@
       50%       { opacity: 0.6; }
     }
 
-    body.picking-location #map { cursor: crosshair; }
+        body.picking-location #map { cursor: crosshair; }
+
+    /* === МОБІЛЬНА АДАПТАЦІЯ === */
+    @media (max-width: 768px) {
+      /* 1. Робимо сторінку гнучкою, скасовуємо жорсткі позиції */
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* 2. Приборкуємо гігантський логотип */
+      #our-name {
+        position: relative; /* Скасовуємо absolute */
+        top: 0; left: 0;
+        font-size: 3rem; /* Робимо адекватний розмір */
+        margin: 15px 0;
+        text-align: center;
+      }
+
+      /* 3. Зменшуємо кнопку профілю і залишаємо в кутку */
+      #profile-button {
+        height: 40px;
+        width: 40px;
+        font-size: 16px;
+        top: 15px;
+        right: 15px;
+        border-width: 2px;
+      }
+
+      /* 4. Кнопки (Створити, Донат, Фільтри) - вишиковуємо в 2 колонки */
+      .actions-wrapper {
+        position: relative; /* Скасовуємо absolute */
+        top: 0; right: 0;
+        width: 100%;
+        padding: 0 15px;
+        margin-bottom: 10px;
+      }
+      #actions {
+        display: flex;
+        flex-wrap: wrap; /* Дозволяємо переноситись на новий рядок */
+        justify-content: space-between;
+        gap: 10px;
+      }
+      button.action-btn, .filters-container {
+        flex: 1 1 calc(50% - 5px); /* Кнопки займають рівно половину екрана */
+        width: 100%;
+      }
+      #filters-button {
+        width: 100%; /* Фільтр розтягується на свою половинку */
+      }
+      #filters {
+        top: 45px;
+        width: 100%; /* Випадаюче меню фільтрів на всю ширину кнопки */
+      }
+
+      /* 5. Кнопка пошуку */
+      #search-button {
+        position: relative; /* Скасовуємо absolute */
+        top: 0; right: 0;
+        width: calc(100% - 30px);
+        margin: 0 auto 15px;
+        display: block;
+      }
+
+      /* 6. Карта - прибираємо величезний відступ зверху */
+      #map {
+        margin-top: 0;
+        width: calc(100% - 30px);
+        height: 60vh; /* Висота карти на телефоні */
+        margin-bottom: 20px;
+      }
+
+      /* 7. Попап з геолокацією */
+      #geolocation-popup {
+        width: 90%;
+        padding: 15px;
+      }
+    }
+
 
     /* ── User dot marker ── */
     .user-marker .dot {

@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0""")/>>
+  <title>Volungo – Вхід</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet""")/>>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest:   #1a3d2b; --moss:     #2d6a4f; --leaf:     #52b788;
+      --mint:     #b7e4c7; --cream:    #f4f1eb; --bark:     #3d2b1f; --gold:     #c9a84c;
+    }
+    body { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; font-family: 'DM Sans', sans-serif; background: var(--cream); overflow: hidden; }
+
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .panel-right { display: none; }
+    }
+
+    .panel-left { display: flex; align-items: center; justify-content: center; padding: 3rem; background: var(--cream); position: relative; overflow-y: auto; }
+    .panel-left::before { content: ''; position: absolute; width: 120px; height: 120px; border-color: var(--mint); border-style: solid; opacity: 0.5; top: 2rem; left: 2rem; border-width: 1px 0 0 1px; }
+
+    .form-card { width: 100%; max-width: 400px; animation: fadeUp 0.6s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+    .form-header { margin-bottom: 2rem; }
+    .form-eyebrow { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--leaf); font-weight: 500; margin-bottom: 0.5rem; }
+    .form-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 2rem; color: var(--forest); line-height: 1.15; }
+
+    .form-group { margin-bottom: 1.1rem; }
+    label { display: block; font-size: 0.78rem; font-weight: 500; color: var(--bark); margin-bottom: 0.4rem; text-transform: uppercase; }
+    input { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid #d4ccbe; border-radius: 8px; outline: none; transition: 0.2s; }
+    input:focus { border-color: var(--leaf); box-shadow: 0 0 0 3px rgba(82,183,136,0.15); }
+
+    .btn-login { width: 100%; padding: 0.9rem; background: var(--moss); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+    .btn-login:hover { background: var(--forest); transform: translateY(-1px); }
+
+    .panel-right { background: var(--forest); display: flex; flex-direction: column; justify-content: center; padding: 3.5rem; position: relative; }
+    .wordmark { font-family: 'Fraunces', serif; font-size: 2.6rem; color: var(--cream); }
+    .wordmark span { color: var(--leaf); }
+    .tagline { color: var(--mint); font-style: italic; opacity: 0.8; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="panel-left">
+    <div class="form-card">
+      <div class="form-header">
+        <p class="form-eyebrow">Вітаємо знову</p>
+        <h1 class="form-title">Увійти в Volungo</h1>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Логін або Email</label>
+          <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+          <label>Пароль</label>
+          <input type="password" name="password" required>
+        </div>
+
+        <button type="submit" class="btn-login">Увійти</button>
+      </form>
+
+      <div class="signin-row">
+        Немає акаунту? <a href="{% url 'register' %}">Приєднатися</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-right">
+    <div class="panel-right-content">
+      <div class="wordmark">Volun<span>go</span></div>
+      <p class="tagline">Творимо добро разом.</p>
+    </div>
+  </div>
+</body>
+</html>

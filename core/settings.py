@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-u!_j5yuayhooaqxg)@nktsyf2uyent$^9)3=9k+q0zm13k_c8j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -124,5 +124,5 @@ import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_REDIRECT_URL = 'my_profile'
+LOGIN_REDIRECT_URL = '/map/'
 LOGIN_URL = 'login'

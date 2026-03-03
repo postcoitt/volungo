@@ -351,10 +351,65 @@
     }
 
     @media (max-width: 768px) {
-      .page-wrap { grid-template-columns: 1fr; }
-      .field-row { grid-template-columns: 1fr; }
-      .submit-row { flex-direction: column-reverse; }
-      .btn-cancel, .btn-submit { width: 100%; justify-content: center; }
+      /* === 1. Вирішення перекриття в шапці (topbar) === */
+      .topbar {
+        padding: 0 1rem; /* Зменшуємо відступи, щоб звільнити місце */
+        height: 56px; /* Робимо шапку трохи компактнішою */
+      }
+      .wordmark {
+        font-size: 1.3rem; /* Зменшуємо логотип, щоб він не наїжджав */
+      }
+      .topbar-right {
+        gap: 0.5rem; /* Компактніше розташування елементів */
+      }
+      .btn-back {
+        /* Приховуємо текст кнопки назад, залишаємо лише стрілку, щоб зберегти місце */
+        padding: 0.4rem;
+        gap: 0;
+      }
+      .btn-back span { display: none; } /* Приховує текст "Повернутись до карти" */
+
+      .btn-profile {
+        width: 32px; height: 32px; /* Зменшуємо кружок профілю */
+        font-size: 0.8rem;
+      }
+
+      /* === 2. Компактність контенту сторінки === */
+      .page-wrap {
+        grid-template-columns: 1fr; /* Колонки одна під одною */
+        padding: 1.5rem 1rem 3rem; /* Зменшені відступи по боках */
+        gap: 1.5rem; /* Компактніша сітка */
+      }
+
+      .page-title-block {
+        padding-bottom: 1rem; /* Акуратніша шапка сторінки */
+      }
+      .page-title {
+        font-size: 1.8rem; /* Зменшений заголовок */
+      }
+
+      /* === 3. Елементи форми === */
+      .form-panel { gap: 1rem; } /* Менші відступи між полями */
+      .field-row {
+        grid-template-columns: 1fr; /* Поля дати/часу одне під одним */
+        gap: 0.8rem;
+      }
+
+      /* === 4. Карта та кнопки внизу === */
+      #location-map {
+        height: 250px; /* Карта стає меншою для телефону */
+      }
+
+      .submit-row {
+        flex-direction: column-reverse; /* Кнопки скасувати/створити вертикально */
+        gap: 0.8rem;
+        padding-top: 1rem;
+      }
+      .btn-cancel, .btn-submit {
+        width: 100%; /* Кнопки на всю ширину */
+        justify-content: center;
+        padding: 0.8rem; /* Більш зручний розмір для натискання пальцем */
+      }
     }
   </style>
 </head>
