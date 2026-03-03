@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <title>Профіль: {{ profile_user.username }}</title>
     <style>
-        /* Базові стилі */
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f0f4f2; color: #000; }
         .header { background: #064e3b; color: white; padding: 25px 80px; font-size: 32px; font-weight: bold; }
         .container { display: flex; padding: 50px 80px; gap: 60px; }
 
-        /* Ліва частина */
         .sidebar { width: 220px; text-align: center; }
         .avatar-container { width: 180px; height: 180px; margin: 0 auto; position: relative; border-radius: 50%; cursor: pointer; }
         .avatar-border { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #f1d35a; overflow: hidden; background: #ddd; position: relative; }
@@ -18,29 +16,19 @@
         .avatar-container:hover .avatar-overlay { opacity: 1; }
 
         .level-tag { background: #f1d35a; border-radius: 20px; padding: 5px 20px; display: inline-block; margin-top: 15px; font-weight: bold; color: #000; }
-        .xp-info { font-size: 14px; margin: 10px 0 20px; color: #444; }
 
         .skill-tags div {
-            border-radius: 20px;
-            padding: 6px 15px;
-            color: #e0e0e0;
-            margin-bottom: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            border: 2px solid #222;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            border-radius: 20px; padding: 6px 15px; color: #e0e0e0; margin-bottom: 10px;
+            font-size: 16px; font-weight: bold; border: 2px solid #222;
+            text-align: left; display: flex; align-items: center; gap: 8px;
         }
 
-        /* Центр */
         .content { flex: 1; }
         .user-header h2 { font-style: italic; font-weight: 800; margin-bottom: 0; color: #064e3b; }
         .user-header h1 { font-size: 40px; margin-top: 0; font-weight: 500; }
         .bio-text { font-size: 16px; color: #555; margin-bottom: 20px; line-height: 1.5; }
 
-        .actions { display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; }
+        .actions { display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; align-items: center; }
         .btn { border-radius: 25px; padding: 10px 25px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; border: none; }
         .btn-blue { background: #064e3b; color: white; }
         .btn-outline { background: white; border: 2px solid #064e3b; color: #064e3b; }
@@ -49,104 +37,63 @@
         .events-title { font-style: italic; font-size: 28px; margin-top: 40px; border-bottom: 2px solid #064e3b; padding-bottom: 5px; }
         .event-item { margin-top: 20px; display: flex; gap: 15px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .event-details { width: 100%; }
-        .event-details strong { font-size: 20px; color: #064e3b; }
 
-        /* ЗМІНЕНО: зірки тепер рендеряться динамічно через JS, стиль залишений */
         .stars { font-size: 18px; margin: 5px 0; font-weight: bold; display: flex; align-items: center; gap: 4px; }
         .stars .star-filled { color: #f1d35a; }
         .stars .star-empty  { color: #ddd; }
         .stars .rating-num  { font-size: 14px; color: #888; font-weight: 600; margin-left: 4px; }
-
         .quote { font-style: italic; color: #555; margin: 10px 0; }
 
-        .user-stats {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 15px;
-            background: #f9f9f9;
-            border-radius: 12px;
-            padding: 10px;
-            border: 1px solid #eee;
+        .user-stats { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; background: #f9f9f9; border-radius: 12px; padding: 10px; border: 1px solid #eee; }
+        .stat-box { display: flex; flex-direction: column; text-align: center; }
+        .stat-value { font-size: 18px; font-weight: bold; color: #14532d; }
+        .stat-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-divider { width: 1px; height: 30px; background: #ddd; }
+
+        /* ── Friend button states ── */
+        .btn-friend {
+            padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: 14px;
+            cursor: pointer; border: 2px solid; display: inline-flex; align-items: center;
+            gap: 8px; transition: all 0.25s ease;
         }
+        /* none → add */
+        .btn-friend-add { background: #14532d; color: white; border-color: #14532d; }
+        .btn-friend-add:hover { background: white; color: #14532d; }
 
-        .stat-box {
-            display: flex;
-            flex-direction: column;
-            text-align: center;
+        /* pending sent → grey, disabled-look */
+        .btn-friend-pending { background: #f0f0f0; color: #888; border-color: #ccc; cursor: default; }
+
+        /* request received → highlight to accept */
+        .btn-friend-accept { background: #2ecc71; color: white; border-color: #27ae60; }
+        .btn-friend-accept:hover { background: #27ae60; }
+
+        /* friends → green, hover to remove */
+        .btn-friend-friends { background: #2ecc71; color: white; border-color: #27ae60; }
+        .btn-friend-friends:hover { background: #c0392b; border-color: #c0392b; }
+
+        /* View friends link */
+        .btn-friends-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: 14px;
+            text-decoration: none; color: #14532d; border: 2px solid #14532d; background: white;
+            transition: all 0.2s;
         }
+        .btn-friends-link:hover { background: #14532d; color: white; }
 
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #14532d;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-divider {
-            width: 1px;
-            height: 30px;
-            background: #ddd;
-        }
-
-        .btn-friend-modern {
-            background-color: #14532d;
-            color: white;
-            border: 2px solid #14532d;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-friend-modern:hover {
-            background-color: white;
-            color: #14532d;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-friend-modern:active { transform: translateY(0); }
-        .btn-friend-modern .icon { font-size: 16px; }
-
-        /* Права частина */
         .achievements { width: 300px; }
         .achievements h2 { font-size: 32px; margin-bottom: 25px; color: #064e3b; }
         .ach-item { border-radius: 40px; padding: 12px 25px; color: white; margin-bottom: 5px; display: flex; align-items: center; gap: 12px; font-weight: bold; background: #14532d; }
 
         .form-input { padding: 10px; width: 90%; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; margin-bottom: 12px; }
-
-        .btn-delete-review {
-            background: none;
-            border: none;
-            color: #c0392b;
-            cursor: pointer;
-            font-size: 13px;
-            padding: 0;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
+        .btn-delete-review { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 13px; padding: 0; opacity: 0.7; transition: opacity 0.2s; }
         .btn-delete-review:hover { opacity: 1; }
     </style>
 </head>
 <body>
 
-<div class="header" style="display: flex; align-items: center; justify-content: space-between;">
+<div class="header" style="display:flex; align-items:center; justify-content:space-between;">
     <span>Профіль учасника</span>
-    <a href="{% url 'map' %}" style="color: white; font-size: 16px; font-weight: normal; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);">← Повернутись до карти</a>
+    <a href="{% url 'map' %}" style="color:white; font-size:16px; font-weight:normal; text-decoration:none; background:rgba(255,255,255,0.15); padding:8px 20px; border-radius:20px; border:1px solid rgba(255,255,255,0.3);">← Повернутись до карти</a>
 </div>
 
 <div class="container">
@@ -161,10 +108,10 @@
                         <div class="avatar-overlay">📸 Змінити фото</div>
                     </div>
                 </div>
-                <input type="file" name="avatar" id="avatar-input" style="display: none;" accept="image/*" onchange="document.getElementById('avatar-form').submit();">
+                <input type="file" name="avatar" id="avatar-input" style="display:none;" accept="image/*" onchange="document.getElementById('avatar-form').submit();">
             </form>
         {% else %}
-            <div class="avatar-container" style="cursor: default;">
+            <div class="avatar-container" style="cursor:default;">
                 <div class="avatar-border">
                     {% if profile.avatar %}<img src="{{ profile.avatar.url }}" alt="Аватар">
                     {% else %}<img src="https://ui-avatars.com/api/?name={{ profile_user.username }}&background=064e3b&color=fff&size=180" alt="Аватар">{% endif %}
@@ -184,12 +131,11 @@
                 <span class="stat-label">рейтинг</span>
             </div>
         </div>
-
-        <div class="skill-tags">
+        <div class="skill-tags" style="margin-top:15px;">
             {% for tag in skill_tags %}
-                <div style="background-color: {{ tag.color }};">{{ tag.name }}</div>
+                <div style="background-color:{{ tag.color }};">{{ tag.name }}</div>
             {% empty %}
-                <p style="font-size: 13px; color: #777;">Немає бейджів</p>
+                <p style="font-size:13px; color:#777;">Немає бейджів</p>
             {% endfor %}
         </div>
     </div>
@@ -203,83 +149,74 @@
 
         {% if messages %}
             {% for message in messages %}
-                <div style="padding: 15px; margin-bottom: 20px; border-radius: 8px; font-weight: bold; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
-                    {{ message }}
-                </div>
+                <div style="padding:15px; margin-bottom:20px; border-radius:8px; font-weight:bold; background:#d4edda; color:#155724; border:1px solid #c3e6cb;">{{ message }}</div>
             {% endfor %}
         {% endif %}
 
         <div class="actions">
-            <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add_friend">
-                <button type="submit" class="btn-friend-modern">
-                    <span class="icon">👤</span> Додати до друзів
-                </button>
-            </form>
+
+            {# ── Friend button — 4 states ── #}
+            {% if friend_status == 'none' %}
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="send_friend_request">
+                    <button type="submit" class="btn-friend btn-friend-add">👤 Додати до друзів</button>
+                </form>
+
+            {% elif friend_status == 'request_sent' %}
+                <button class="btn-friend btn-friend-pending" disabled>⏳ Запит надіслано</button>
+
+            {% elif friend_status == 'request_received' %}
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="send_friend_request">
+                    <button type="submit" class="btn-friend btn-friend-accept">✓ Прийняти запит</button>
+                </form>
+
+            {% elif friend_status == 'friends' %}
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_friend">
+                    <button type="submit" class="btn-friend btn-friend-friends"
+                            onmouseover="this.textContent='✕ Видалити з друзів'"
+                            onmouseout="this.textContent='✓ У друзях'">✓ У друзях</button>
+                </form>
+            {% endif %}
+
+            {# Friends list link #}
+            <a href="{% url 'friends_list' profile_user.username %}" class="btn-friends-link">
+                👥 Друзі <span style="font-size:12px; opacity:0.7;">({{ friends_count }})</span>
+            </a>
+
             <button class="btn btn-outline" onclick="document.getElementById('review-form').style.display='block'">Додати відгук</button>
-            <button class="btn btn-outline" style="border-color: #f1d35a; color: #a64d79;" onclick="document.getElementById('hours-form').style.display='block'">+ Додати години</button>
-            <button class="btn btn-outline" style="border-color: #14532d; color: #14532d;" onclick="document.getElementById('badge-form').style.display='block'">+ Додати бейдж</button>
         </div>
 
-        <div id="review-form" style="display: none; background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0; color: #064e3b;">Залишити відгук</h3>
+        <div id="review-form" style="display:none; background:#fff; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+            <h3 style="margin-top:0; color:#064e3b;">Залишити відгук</h3>
             {% if user.is_authenticated %}
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="add_review">
                     {{ form.as_p }}
-                    <button type="submit" class="btn btn-blue" style="margin-top: 10px;">Відправити</button>
+                    <button type="submit" class="btn btn-blue" style="margin-top:10px;">Відправити</button>
                     <button type="button" class="btn btn-outline" onclick="document.getElementById('review-form').style.display='none'">Скасувати</button>
                 </form>
             {% else %}
-                <p style="color: red;">Потрібно увійти в систему.</p>
+                <p style="color:red;">Потрібно увійти в систему.</p>
             {% endif %}
-        </div>
-
-        <div id="hours-form" style="display: none; background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #f1d35a;">
-            <h3 style="margin-top: 0;">Підтвердження годин</h3>
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add_hours">
-                <input type="text" name="auth_username" required placeholder="Ваш логін" class="form-input">
-                <input type="password" name="auth_password" required placeholder="Ваш пароль" class="form-input">
-                <input type="number" name="hours" min="1" max="100" required placeholder="Кількість годин" class="form-input">
-                <br><button type="submit" class="btn btn-blue">Підтвердити</button>
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('hours-form').style.display='none'">Скасувати</button>
-            </form>
-        </div>
-
-        <div id="badge-form" style="display: none; background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #14532d;">
-            <h3 style="margin-top: 0;">Видати бейдж</h3>
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add_badge">
-                <input type="text" name="auth_username" required placeholder="Ваш логін" class="form-input">
-                <input type="password" name="auth_password" required placeholder="Ваш пароль" class="form-input">
-                <select name="tag_id" class="form-input" required>
-                    <option value="">-- Виберіть бейдж --</option>
-                    {% for tag in available_tags %}
-                        <option value="{{ tag.id }}">{{ tag.name }}</option>
-                    {% endfor %}
-                </select>
-                <br><button type="submit" class="btn btn-blue">Видати бейдж</button>
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('badge-form').style.display='none'">Скасувати</button>
-            </form>
         </div>
 
         <div class="events-title">Відгуки як помічника:</div>
         {% for review in helper_reviews %}
             <div class="event-item">
-                <span style="font-size: 24px;">🤝</span>
+                <span style="font-size:24px;">🤝</span>
                 <div class="event-details">
-                    <!-- ЗМІНЕНО: data-rating передає реальну оцінку, JS рендерить зірки -->
                     <div class="stars" data-rating="{{ review.rating }}"></div>
                     <p class="quote">"{{ review.text }}"</p>
-                    <div class="author" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div class="author" style="display:flex; align-items:center; justify-content:space-between;">
                         <span>Від: <strong>{{ review.author.username }}</strong></span>
                         {% if user == review.author %}
-                        <form method="POST" action="{% url 'delete_review' review.id %}" style="display: inline;">
+                        <form method="POST" action="{% url 'delete_review' review.id %}" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn-delete-review" onclick="return confirm('Видалити відгук?')">🗑 Видалити</button>
                         </form>
@@ -288,21 +225,20 @@
                 </div>
             </div>
         {% empty %}
-            <p style="color: #777; margin-top: 15px;">Ще немає відгуків.</p>
+            <p style="color:#777; margin-top:15px;">Ще немає відгуків.</p>
         {% endfor %}
 
-        <div class="events-title" style="margin-top: 50px;">Відгуки як організатора:</div>
+        <div class="events-title" style="margin-top:50px;">Відгуки як організатора:</div>
         {% for review in organizer_reviews %}
-            <div class="event-item" style="border-left: 5px solid #c2b35a;">
-                <span style="font-size: 24px;">🏢</span>
+            <div class="event-item" style="border-left:5px solid #c2b35a;">
+                <span style="font-size:24px;">🏢</span>
                 <div class="event-details">
-                    <!-- ЗМІНЕНО: data-rating передає реальну оцінку, JS рендерить зірки -->
                     <div class="stars" data-rating="{{ review.rating }}"></div>
                     <p class="quote">"{{ review.text }}"</p>
-                    <div class="author" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div class="author" style="display:flex; align-items:center; justify-content:space-between;">
                         <span>Від: <strong>{{ review.author.username }}</strong></span>
                         {% if user == review.author %}
-                        <form method="POST" action="{% url 'delete_review' review.id %}" style="display: inline;">
+                        <form method="POST" action="{% url 'delete_review' review.id %}" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="btn-delete-review" onclick="return confirm('Видалити відгук?')">🗑 Видалити</button>
                         </form>
@@ -311,7 +247,7 @@
                 </div>
             </div>
         {% empty %}
-            <p style="color: #777; margin-top: 15px;">Ще немає відгуків.</p>
+            <p style="color:#777; margin-top:15px;">Ще немає відгуків.</p>
         {% endfor %}
     </div>
 
@@ -320,22 +256,17 @@
         {% for badge in badges %}
             <div class="ach-item">🏆 {{ badge.name }}</div>
         {% empty %}
-            <p style="color: #777;">Поки немає досягнень.</p>
+            <p style="color:#777;">Поки немає досягнень.</p>
         {% endfor %}
     </div>
 </div>
 
-<!-- ДОДАНО: скрипт що рендерить зірки динамічно по data-rating -->
 <script>
   document.querySelectorAll('.stars[data-rating]').forEach(function(el) {
     const rating = parseInt(el.getAttribute('data-rating'), 10);
     let html = '';
     for (let i = 1; i <= 5; i++) {
-      if (i <= rating) {
-        html += '<span class="star-filled">★</span>';
-      } else {
-        html += '<span class="star-empty">★</span>';
-      }
+      html += i <= rating ? '<span class="star-filled">★</span>' : '<span class="star-empty">★</span>';
     }
     html += '<span class="rating-num">' + rating + '/5</span>';
     el.innerHTML = html;

@@ -4,6 +4,9 @@ from . import views
 
 urlpatterns = [
     path('profile/<str:username>/', views.user_profile, name='profile'),
+    path('profile/<str:username>/friends/', views.friends_list, name='friends_list'),
+    path('friend-request/<int:request_id>/accept/', views.accept_friend_request, name='accept_friend_request'),
+    path('friend-request/<int:request_id>/decline/', views.decline_friend_request, name='decline_friend_request'),
     path('my-profile/', views.my_profile_redirect, name='my_profile'),
     path('test-event/', views.test_event_view, name='test_event'),
     path('register/', views.register, name='register'),
