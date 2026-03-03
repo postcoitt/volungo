@@ -71,7 +71,7 @@
     <!-- Owner summary -->
     <div class="owner-card">
         <img class="owner-avatar"
-             src="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ profile_user.username }}&background=064e3b&color=fff&size=60{% endif %}"
+             src="{% if profile_user.profile.avatar_url %}{{ profile_user.profile.avatar_url }}{% else %}https://ui-avatars.com/api/?name={{ profile_user.username }}&background=064e3b&color=fff&size=60{% endif %}"
              alt="{{ profile_user.username }}">
         <div class="owner-info">
             <h2>{{ profile_user.get_full_name|default:profile_user.username }}</h2>
@@ -87,7 +87,7 @@
         {% for req in pending_requests %}
         <div class="pending-card">
             <img class="pending-avatar"
-                 src="{% if req.from_user.profile.avatar %}{{ req.from_user.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ req.from_user.username }}&background=064e3b&color=fff&size=48{% endif %}"
+                 src="{% if req.from_user.profile.avatar_url %}{{ req.from_user.profile.avatar_url }}{% else %}https://ui-avatars.com/api/?name={{ req.from_user.username }}&background=064e3b&color=fff&size=48{% endif %}"
                  alt="{{ req.from_user.username }}">
             <div class="pending-info">
                 <div class="pending-name">
@@ -119,7 +119,7 @@
             {% for item in friends_data %}
             <a href="{% url 'user_profile' item.profile.user.username %}" class="friend-card">
                 <img class="friend-avatar"
-                     src="{% if item.profile.avatar %}{{ item.profile.avatar.url }}{% else %}https://ui-avatars.com/api/?name={{ item.profile.user.username }}&background=064e3b&color=fff&size=72{% endif %}"
+                     src="{% if item.profile.avatar_url %}{{ item.profile.avatar_url }}{% else %}https://ui-avatars.com/api/?name={{ item.profile.user.username }}&background=064e3b&color=fff&size=72{% endif %}"
                      alt="{{ item.profile.user.username }}">
                 <div class="friend-name">{{ item.profile.user.get_full_name|default:item.profile.user.username }}</div>
                 <div class="friend-level">{{ item.profile.level }}</div>
