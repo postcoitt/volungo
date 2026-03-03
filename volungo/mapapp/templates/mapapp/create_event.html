@@ -365,8 +365,13 @@
   <a class="wordmark" href="{% url 'map' %}">Volun<span>go</span></a>
   <div class="topbar-right">
     <a class="btn-back" href="{% url 'map' %}">← Повернутись до карти</a>
-    <a class="btn-profile" href="#" title="Ваш профіль">
-      {{ request.user.username|first|upper }}
+    <a class="btn-profile" href="{% url 'profile' request.user.username %}" title="Ваш профіль">
+      {% if request.user.profile.avatar_url %}
+        <img src="{{ request.user.profile.avatar_url }}" alt="Аватар"
+            style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+      {% else %}
+        {{ request.user.username|first|upper }}
+      {% endif %}
     </a>
   </div>
 </nav>

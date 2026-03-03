@@ -141,9 +141,14 @@
 
                 <h3 style="margin-left: 10px; margin-bottom: 15px; color: #555; font-size: 16px; font-weight: 600;">Організатор</h3>
                 <div class="organizer-card">
-                    <div class="organizer-avatar">
-                        {{ event.organizer.username|make_list|first|upper }}
-                    </div>
+                    {% if organizer_profile.avatar_url %}
+                        <img src="{{ organizer_profile.avatar_url }}" alt="Аватар"
+                            style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:4px solid #f1c40f; margin:0 auto 15px auto; display:block;">
+                    {% else %}
+                        <div class="organizer-avatar">
+                            {{ event.organizer.username|make_list|first|upper }}
+                        </div>
+                    {% endif %}
                     <p class="organizer-name">{{ event.organizer.username }}</p>
 
                     <div class="org-stats">

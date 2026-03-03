@@ -78,15 +78,21 @@ def create_event(request):
 
 def event_detail_view(request, event_id):
     from mapapp.models import Event as MapEvent, EventRegistration
+    from users.models import UserProfile
+
     event = get_object_or_404(MapEvent, id=event_id)
     is_registered = False
     if request.user.is_authenticated:
         is_registered = EventRegistration.objects.filter(
             event=event, user=request.user
         ).exists()
+
+    organizer_profile, _ = UserProfile.objects.get_or_create(user=event.organiser)
+
     return render(request, 'users/events/event.html', {
         'event': event,
         'is_registered': is_registered,
+        'organizer_profile': organizer_profile,
     })
 
 @login_required
