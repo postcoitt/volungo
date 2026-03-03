@@ -46,7 +46,23 @@ def user_profile(request, username):
         action = request.POST.get('action', '')
 
         if 'avatar' in request.FILES and request.user.is_authenticated and request.user == profile_user:
-            profile.avatar = request.FILES['avatar']
+            from django.conf import settings
+            from supabase import create_client
+            import uuid, os
+
+            file = request.FILES['avatar']
+            ext = os.path.splitext(file.name)[1]
+            filename = f"avatar_{uuid.uuid4().hex}{ext}"
+
+            supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+            supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
+                filename,
+                file.read(),
+                {"content-type": file.content_type, "upsert": "true"}
+            )
+
+            public_url = supabase.storage.from_(settings.SUPABASE_BUCKET).get_public_url(filename)
+            profile.avatar_url = public_url
             profile.save()
             return redirect('user_profile', username=username)
 
