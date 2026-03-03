@@ -128,6 +128,7 @@ def event_resolve(request, event_id):
                     review_type='helper',
                     rating=rating,
                     text=text,
+                    event=event
                 )
 
         event.is_completed = True

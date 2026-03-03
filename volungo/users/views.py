@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Q
 from .forms import CustomUserCreationForm, ReviewForm
 from .models import UserProfile, Event, HelperReview, Badge, SkillTag, FriendRequest
+from mapapp.models import EventRegistration
 
 def check_and_assign_badges(profile):
     for badge in Badge.objects.all():
@@ -35,6 +36,9 @@ def _get_friend_status(viewer, target):
 
 
 def user_profile(request, username):
+    from mapapp.models import Event as MapEvent, EventRegistration
+    from django.db.models import Avg
+
     profile_user = get_object_or_404(User, username=username)
     profile, _ = UserProfile.objects.get_or_create(user=profile_user)
 
@@ -42,23 +46,7 @@ def user_profile(request, username):
         action = request.POST.get('action', '')
 
         if 'avatar' in request.FILES and request.user.is_authenticated and request.user == profile_user:
-            from django.conf import settings
-            from supabase import create_client
-            import uuid, os
-
-            file = request.FILES['avatar']
-            ext = os.path.splitext(file.name)[1]
-            filename = f"{username}_{uuid.uuid4().hex}{ext}"
-
-            supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-            supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
-                filename,
-                file.read(),
-                {"content-type": file.content_type, "upsert": "true"}
-            )
-
-            public_url = supabase.storage.from_(settings.SUPABASE_BUCKET).get_public_url(filename)
-            profile.avatar_url = public_url
+            profile.avatar = request.FILES['avatar']
             profile.save()
             return redirect('user_profile', username=username)
 
@@ -71,6 +59,7 @@ def user_profile(request, username):
             return redirect('user_profile', username=username)
 
         if action == 'remove_friend' and request.user.is_authenticated:
+            from django.db.models import Q
             FriendRequest.objects.filter(
                 Q(from_user=request.user, to_user=profile_user) |
                 Q(from_user=profile_user, to_user=request.user)
@@ -96,8 +85,37 @@ def user_profile(request, username):
     if request.user.is_authenticated:
         friend_status = _get_friend_status(request.user, profile_user)
 
-    helper_reviews    = HelperReview.objects.filter(volunteer=profile_user, review_type='helper').order_by('-created_at')
-    organizer_reviews = HelperReview.objects.filter(volunteer=profile_user, review_type='organizer').order_by('-created_at')
+    # ── Events as organiser ──
+    organised_events = MapEvent.objects.filter(organiser=profile_user).order_by('-datetime')
+    organised_data = []
+    for ev in organised_events:
+        avg = HelperReview.objects.filter(
+            event=ev, review_type='organizer'
+        ).aggregate(Avg('rating'))['rating__avg']
+        organised_data.append({
+            'event': ev,
+            'avg_rating': round(avg, 1) if avg else None,
+            'volunteer_count': ev.registrations.count(),
+        })
+
+    # ── Events as volunteer (participated) ──
+    participated_regs = EventRegistration.objects.filter(
+        user=profile_user,
+        event__is_completed=True
+    ).select_related('event').order_by('-event__datetime')
+
+    participated_data = []
+    for reg in participated_regs:
+        review = HelperReview.objects.filter(
+            event=reg.event,
+            volunteer=profile_user,
+            review_type='helper'
+        ).first()
+        participated_data.append({
+            'event': reg.event,
+            'review': review,
+        })
+
     avg_rating = HelperReview.objects.filter(volunteer=profile_user).aggregate(Avg('rating'))['rating__avg']
     avg_rating = round(avg_rating, 1) if avg_rating else 0
 
@@ -108,11 +126,11 @@ def user_profile(request, username):
         'badges': profile.badges.all(),
         'skill_tags': profile.skill_tags.all(),
         'available_tags': SkillTag.objects.all(),
-        'helper_reviews': helper_reviews,
-        'organizer_reviews': organizer_reviews,
         'form': form,
         'friend_status': friend_status,
         'friends_count': profile.friends_count(),
+        'organised_data': organised_data,
+        'participated_data': participated_data,
     }
     return render(request, 'users/profile.html', context)
 

@@ -207,50 +207,71 @@
             {% endif %}
         </div>
 
-        <div class="events-title">Відгуки як помічника:</div>
-        {% for review in helper_reviews %}
-            <div class="event-item">
-                <span style="font-size:24px;">🤝</span>
-                <div class="event-details">
-                    <div class="stars" data-rating="{{ review.rating }}"></div>
-                    <p class="quote">"{{ review.text }}"</p>
-                    <div class="author" style="display:flex; align-items:center; justify-content:space-between;">
-                        <span>Від: <strong>{{ review.author.username }}</strong></span>
-                        {% if user == review.author %}
-                        <form method="POST" action="{% url 'delete_review' review.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-delete-review" onclick="return confirm('Видалити відгук?')">🗑 Видалити</button>
-                        </form>
-                        {% endif %}
+        <!-- ── Events as Organiser ── -->
+        <div class="events-title">Події як організатора:</div>
+        {% if organised_data %}
+            {% for item in organised_data %}
+            <a href="{% url 'event_detail' item.event.id %}" class="event-item" style="text-decoration:none; color:inherit; display:flex; gap:15px; background:white; padding:15px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-top:20px; border-left: 5px solid {% if item.event.is_completed %}#2ecc71{% else %}#f1d35a{% endif %};">
+                <span style="font-size:24px;">{% if item.event.is_completed %}✅{% else %}📅{% endif %}</span>
+                <div style="flex:1;">
+                    <strong style="font-size:17px; color:#064e3b;">{{ item.event.name }}</strong>
+                    <div style="font-size:13px; color:#777; margin-top:4px;">
+                        {{ item.event.datetime|date:"d.m.Y H:i" }} · {{ item.volunteer_count }} волонтер{{ item.volunteer_count|pluralize:",,ів" }}
                     </div>
+                    {% if item.event.is_completed %}
+                        <div style="margin-top:6px; font-size:13px;">
+                            {% if item.avg_rating %}
+                                <span style="color:#f5a623; font-weight:700;">
+                                    {% with r=item.avg_rating %}
+                                        {% for i in "12345" %}★{% endfor %}
+                                    {% endwith %}
+                                </span>
+                                <span style="color:#888; font-size:12px;">{{ item.avg_rating }}/5 середній рейтинг організатора</span>
+                            {% else %}
+                                <span style="color:#aaa; font-style:italic;">Відгуків ще немає</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <span style="font-size:12px; background:#fff9c4; color:#a07d00; padding:2px 10px; border-radius:10px; font-weight:600; margin-top:6px; display:inline-block;">Активна</span>
+                    {% endif %}
                 </div>
-            </div>
-        {% empty %}
-            <p style="color:#777; margin-top:15px;">Ще немає відгуків.</p>
-        {% endfor %}
+                <span style="color:#ccc; font-size:20px; align-self:center;">›</span>
+            </a>
+            {% endfor %}
+        {% else %}
+            <p style="color:#777; margin-top:15px;">Ще не організовано жодної події.</p>
+        {% endif %}
 
-        <div class="events-title" style="margin-top:50px;">Відгуки як організатора:</div>
-        {% for review in organizer_reviews %}
-            <div class="event-item" style="border-left:5px solid #c2b35a;">
-                <span style="font-size:24px;">🏢</span>
-                <div class="event-details">
-                    <div class="stars" data-rating="{{ review.rating }}"></div>
-                    <p class="quote">"{{ review.text }}"</p>
-                    <div class="author" style="display:flex; align-items:center; justify-content:space-between;">
-                        <span>Від: <strong>{{ review.author.username }}</strong></span>
-                        {% if user == review.author %}
-                        <form method="POST" action="{% url 'delete_review' review.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-delete-review" onclick="return confirm('Видалити відгук?')">🗑 Видалити</button>
-                        </form>
-                        {% endif %}
-                    </div>
+        <!-- ── Events as Volunteer ── -->
+        <div class="events-title" style="margin-top:50px;">Події як волонтера:</div>
+        {% if participated_data %}
+            {% for item in participated_data %}
+            <a href="{% url 'event_detail' item.event.id %}" class="event-item" style="text-decoration:none; color:inherit; display:flex; gap:15px; background:white; padding:15px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-top:20px; border-left:5px solid #52b788;">
+                <span style="font-size:24px;">🤝</span>
+                <div style="flex:1;">
+                    <strong style="font-size:17px; color:#064e3b;">{{ item.event.name }}</strong>
+                    <div style="font-size:13px; color:#777; margin-top:4px;">{{ item.event.datetime|date:"d.m.Y H:i" }}</div>
+                    {% if item.review %}
+                        <div style="margin-top:8px;">
+                            <div style="font-size:13px;">
+                                {% for i in "12345" %}
+                                    <span style="color:{% if forloop.counter <= item.review.rating %}#f5a623{% else %}#ddd{% endif %};">★</span>
+                                {% endfor %}
+                                <span style="color:#888; font-size:12px; margin-left:4px;">{{ item.review.rating }}/5</span>
+                            </div>
+                            <p style="font-style:italic; color:#555; font-size:13px; margin:4px 0 0;">"{{ item.review.text }}"</p>
+                            <span style="font-size:12px; color:#999;">— {{ item.review.author.username }}</span>
+                        </div>
+                    {% else %}
+                        <span style="color:#aaa; font-style:italic; font-size:13px;">Відгук від організатора ще не надано</span>
+                    {% endif %}
                 </div>
-            </div>
-        {% empty %}
-            <p style="color:#777; margin-top:15px;">Ще немає відгуків.</p>
-        {% endfor %}
-    </div>
+                <span style="color:#ccc; font-size:20px; align-self:center;">›</span>
+            </a>
+            {% endfor %}
+        {% else %}
+            <p style="color:#777; margin-top:15px;">Ще не брали участі в жодній події.</p>
+        {% endif %}
 
     <div class="achievements">
         <h2>Досягнення:</h2>

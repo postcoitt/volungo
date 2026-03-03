@@ -169,7 +169,45 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+
+            <!-- ── Reviews section ── -->
+            {% if event.is_completed %}
+            <div style="margin-top:40px; margin-bottom:60px;">
+                <div style="font-size:22px; font-weight:700; color:#1a6b46; border-bottom:2px solid #f1c40f; padding-bottom:6px; margin-bottom:20px; display:inline-block;">
+                    Відгуки про організатора цієї події
+                </div>
+
+                {% with reviews=event.reviews.all %}
+                {% if reviews %}
+                    {% for review in reviews %}
+                    <div style="background:white; border-radius:12px; padding:20px 25px; margin-bottom:16px; border:1px solid #e8f5e9; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                            <img src="https://ui-avatars.com/api/?name={{ review.author.username }}&background=064e3b&color=fff&size=40"
+                                style="width:40px; height:40px; border-radius:50%; border:2px solid #f1c40f;">
+                            <div>
+                                <strong style="color:#064e3b;">{{ review.author.username }}</strong>
+                                <div style="font-size:12px; color:#999;">{{ review.created_at|date:"d.m.Y" }}</div>
+                            </div>
+                            <div style="margin-left:auto;">
+                                {% for i in "12345" %}
+                                    <span style="font-size:18px; color:{% if forloop.counter <= review.rating %}#f5a623{% else %}#ddd{% endif %};">★</span>
+                                {% endfor %}
+                                <span style="font-size:13px; color:#888; margin-left:4px;">{{ review.rating }}/5</span>
+                            </div>
+                        </div>
+                        <p style="font-style:italic; color:#444; margin:0; font-size:15px; line-height:1.6;">"{{ review.text }}"</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color:#999; font-style:italic;">Ще немає відгуків про цю подію.</p>
+                {% endif %}
+                {% endwith %}
+            </div>
+            {% endif %}
+
+            </div>
 
 </body>
+</html>
 </html>
