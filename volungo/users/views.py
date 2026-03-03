@@ -7,7 +7,6 @@ from django.db.models import Avg, Q
 from .forms import CustomUserCreationForm, ReviewForm
 from .models import UserProfile, Event, HelperReview, Badge, SkillTag, FriendRequest
 
-
 def check_and_assign_badges(profile):
     for badge in Badge.objects.all():
         if profile.xp >= badge.required_xp and badge not in profile.badges.all():
@@ -43,7 +42,23 @@ def user_profile(request, username):
         action = request.POST.get('action', '')
 
         if 'avatar' in request.FILES and request.user.is_authenticated and request.user == profile_user:
-            profile.avatar = request.FILES['avatar']
+            from django.conf import settings
+            from supabase import create_client
+            import uuid, os
+
+            file = request.FILES['avatar']
+            ext = os.path.splitext(file.name)[1]
+            filename = f"{username}_{uuid.uuid4().hex}{ext}"
+
+            supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+            supabase.storage.from_(settings.SUPABASE_BUCKET).upload(
+                filename,
+                file.read(),
+                {"content-type": file.content_type, "upsert": "true"}
+            )
+
+            public_url = supabase.storage.from_(settings.SUPABASE_BUCKET).get_public_url(filename)
+            profile.avatar_url = public_url
             profile.save()
             return redirect('user_profile', username=username)
 

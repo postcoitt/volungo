@@ -124,5 +124,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/map/'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+SUPABASE_URL = 'https://aepofkxnujkyvjqihliv.supabase.co'
+SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlcG9ma3hudWpreXZqcWlobGl2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjExOTY3NCwiZXhwIjoyMDg3Njk1Njc0fQ.6XARBEtlRw9AruCzSyDDyoy-53IrdLgVDBFjt3N-rpw'
+SUPABASE_BUCKET = 'avatars'

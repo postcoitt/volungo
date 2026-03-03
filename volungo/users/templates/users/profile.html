@@ -103,8 +103,8 @@
                 {% csrf_token %}
                 <div class="avatar-container" onclick="document.getElementById('avatar-input').click()">
                     <div class="avatar-border">
-                        {% if profile.avatar %}<img src="{{ profile.avatar.url }}" alt="Аватар">
-                        {% else %}<img src="https://ui-avatars.com/api/?name={{ profile_user.username }}&background=064e3b&color=fff&size=180" alt="Аватар">{% endif %}
+                        {% if profile.avatar_url %}<img src="{{ profile.avatar_url }}" alt="Аватар">
+                            {% else %}<img src="https://ui-avatars.com/api/?name={{ profile_user.username }}&background=064e3b&color=fff&size=180" alt="Аватар">{% endif %}
                         <div class="avatar-overlay">📸 Змінити фото</div>
                     </div>
                 </div>

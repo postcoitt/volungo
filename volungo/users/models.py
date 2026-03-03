@@ -21,6 +21,7 @@ class UserProfile(models.Model):
     badges = models.ManyToManyField(Badge, blank=True, verbose_name="Досягнення")
     skill_tags = models.ManyToManyField(SkillTag, blank=True, verbose_name="Бейджі під аватаркою")
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True, verbose_name="Аватар")
+    avatar_url = models.URLField(blank=True, null=True, verbose_name="URL аватара (Supabase)")  # ← додай сюди
     age = models.PositiveIntegerField(null=True, blank=True, verbose_name="Вік")
     xp = models.PositiveIntegerField(default=0, verbose_name="Години (XP)")
     level = models.CharField(max_length=50, default="Новачок", verbose_name="Рівень")
