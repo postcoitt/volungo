@@ -792,61 +792,334 @@
     }
     #expired-popup-inner a:hover { background: var(--forest); }
 
-    @media (max-width: 900px) {
-      #event-modal { width: 98vw; }
-      .modal-route-distance { font-size: 1.2rem; }
-      .topbar { padding: 0 1.2rem; }
-      .topbar-right { gap: 0.5rem; }
-      .btn-action span, .btn-filter span, .btn-search span { display: none; }
-    }
+    @media (max-width: 768px) {
+      /* Топбар гарно, як на фото */
+      .topbar {
+        height: auto;
+        padding: 0.6rem;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
 
-    /* МОБІЛЬНА АДАПТАЦІЯ (600px) */
-    @media (max-width: 600px) {
-      .topbar { padding: 0.8rem; flex-wrap: wrap; gap: 0.6rem; }
-      .wordmark { font-size: 1.2rem; }
-      .topbar-right { width: 100%; flex-wrap: wrap; gap: 0.6rem; }
-      .btn-action, .btn-filter, .btn-search { padding: 0.5rem 0.8rem; font-size: 0.75rem; height: 36px; }
-      .search-wrapper { width: 100%; order: 3; }
-      .search-input-wrap { width: 100%; }
-      .search-input-wrap input { width: 100%; padding: 0.5rem 0.8rem; }
-      #event-modal { width: 95vw; max-height: 85vh; max-width: none; }
-      .modal-header { flex-direction: column; gap: 1rem; padding: 1.2rem 1rem; }
-      .modal-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
-      .modal-header-info { width: 100%; }
-      .modal-title { font-size: 1.2rem; margin: 0 0 0.5rem 0; }
-      .modal-route-panel { width: 100%; display: flex !important; flex-direction: row; gap: 0.8rem; padding: 0.8rem; margin-top: 0.8rem; }
-      .modal-categories { padding: 0.8rem 1rem; gap: 0.4rem; }
-      .cat-tag { font-size: 0.7rem; padding: 0.25rem 0.6rem; }
-      .modal-meta { flex-direction: column; gap: 0.8rem; padding: 0.8rem 1rem; }
-      .modal-description { padding: 0.8rem 1rem; }
-      .modal-description h4 { font-size: 0.65rem; }
-      .modal-description p { font-size: 0.85rem; line-height: 1.6; }
-      .modal-footer { flex-direction: column; gap: 0.6rem; padding: 1rem; }
-      .btn-contact, .btn-detail { width: 100%; text-align: center; padding: 0.6rem 1rem; font-size: 0.85rem; }
-      #filters { position: fixed; top: 50px; left: 0; right: 0; bottom: 0; background: #fff; z-index: 999; overflow-y: auto; padding: 1rem; }
-      .filter-dist-row { flex-direction: column; gap: 0.6rem; }
-      .dist-btn { width: 100%; padding: 0.6rem 1rem; }
-      .cat-checkboxes { flex-direction: column; gap: 0.8rem; }
-      .cat-checkboxes label { font-size: 0.85rem; display: flex; gap: 0.5rem; }
-      #reset-filters { width: 100%; padding: 0.7rem 1rem; margin-top: 1rem; }
-      #geolocation-popup { width: 90%; max-width: 320px; padding: 1.2rem 1rem; }
-      #geolocation-popup .buttons { gap: 0.6rem; margin-bottom: 1rem; }
-      #geolocation-popup button { flex: 1; padding: 0.6rem 1rem; font-size: 0.85rem; }
-      #pick-button { width: 100%; padding: 0.7rem 1rem; }
-      #expired-popup-inner { width: 90%; max-width: 320px; padding: 1.5rem 1rem; }
-      #expired-popup-inner h2 { font-size: 1.2rem; }
-      #expired-popup-inner a { padding: 0.6rem 1rem; font-size: 0.85rem; }
-      #search-dropdown { max-height: 300px; width: 100%; }
-      .search-dropdown-item { padding: 0.8rem 1rem; font-size: 0.85rem; }
+      .wordmark {
+        font-size: 1.4rem;
+        text-align: center;
+        width: 100%;
+      }
+
+      /* Перший ряд кнопок - вся ширина */
+      .topbar-right {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+
+      /* Кнопка "Створити подію" - вся ширина */
+      #create-button {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        height: 44px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #create-button span { display: inline; }
+
+      /* Кнопка "Змінити локацію" - вся ширина */
+      #location-button {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        height: 44px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+      }
+      #location-button span { display: inline; }
+
+      /* Точка пошуку */
+      .search-wrapper {
+        width: 100%;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .filters-container {
+        flex-shrink: 0;
+      }
+
+      .btn-filter {
+        padding: 0.6rem 0.8rem;
+        height: 44px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+      }
+      .btn-filter span { display: inline; }
+
+      /* Пошук займає рест простору */
+      .search-input-wrap {
+        flex: 1;
+        border-radius: 8px;
+      }
+
+      #search-input {
+        padding: 0.6rem 0.8rem;
+      }
+      #search-input.expanded {
+        width: 100%;
+        max-width: none;
+      }
+
+      .btn-search {
+        padding: 0.6rem 0.8rem;
+        font-size: 1rem;
+      }
+
+      /* Профіль іконка */
+      .btn-profile {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+
+      /* Вихід іконка */
+      .topbar-right form button {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 1.2rem !important;
+        border-radius: 8px !important;
+        flex-shrink: 0;
+      }
+
+      /* Карта */
+      #map {
+        height: calc(100vh - 260px);
+      }
+
+      /* Фільтри - повноекранна панель */
+      #filters {
+        position: fixed;
+        top: 260px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: none;
+        border: none;
+        border-radius: 0;
+        z-index: 999;
+        overflow-y: auto;
+        padding: 1rem;
+        box-shadow: none;
+        background: #fff;
+      }
+
+      .filter-dist-row {
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .dist-btn {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      .cat-checkboxes {
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .cat-checkboxes label {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      #reset-filters {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        margin-top: 1rem;
+      }
+
+      /* Модаль */
+      #event-modal {
+        width: 95vw;
+        max-height: 85vh;
+        border-radius: 14px;
+      }
+
+      .modal-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.2rem 1rem;
+      }
+
+      .modal-avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 2rem;
+      }
+
+      .modal-title {
+        font-size: 1.25rem;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .modal-route-panel {
+        width: 100%;
+        display: flex !important;
+        flex-direction: row;
+        gap: 0.8rem;
+        padding: 0.8rem;
+        margin-top: 0.8rem;
+      }
+
+      .modal-categories {
+        padding: 0.8rem 1rem;
+        gap: 0.5rem;
+      }
+
+      .cat-tag {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.7rem;
+      }
+
+      .modal-meta {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 0.8rem 1rem;
+      }
+
+      .modal-description {
+        padding: 0.8rem 1rem;
+      }
+
+      .modal-description h4 {
+        font-size: 0.7rem;
+      }
+
+      .modal-description p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 1rem;
+      }
+
+      .btn-contact,
+      .btn-detail {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+      }
+
+      /* Геолокація */
+      #geolocation-popup {
+        width: 90%;
+        max-width: 340px;
+        padding: 1.5rem 1.2rem;
+      }
+
+      #geolocation-popup .buttons {
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+      }
+
+      #geolocation-popup button {
+        flex: 1;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      #pick-button {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      #search-dropdown {
+        max-height: 300px;
+        width: 100%;
+      }
+
+      .search-dropdown-item {
+        padding: 0.8rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      #expired-popup-inner {
+        width: 90%;
+        max-width: 340px;
+        padding: 1.5rem 1.2rem;
+      }
+
+      #expired-popup-inner h2 {
+        font-size: 1.3rem;
+      }
+
+      #expired-popup-inner a {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+      }
     }
 
     @media (max-width: 480px) {
-      .wordmark { font-size: 1rem; }
-      .topbar { padding: 0.6rem; }
-      .btn-action, .btn-filter, .btn-search { padding: 0.45rem 0.7rem; font-size: 0.7rem; height: 32px; }
-      .modal-title { font-size: 1.1rem; }
-      .modal-avatar { width: 50px; height: 50px; font-size: 1.6rem; }
-      .btn-contact, .btn-detail { padding: 0.55rem 0.9rem; font-size: 0.8rem; }
+      .topbar {
+        padding: 0.5rem;
+      }
+
+      #create-button,
+      #location-button,
+      .btn-filter {
+        height: 40px;
+        font-size: 0.8rem;
+      }
+
+      .btn-profile {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+
+      .topbar-right form button {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1.1rem !important;
+      }
+
+      .wordmark { font-size: 1.2rem; }
+
+      #map {
+        height: calc(100vh - 230px);
+      }
+
+      .modal-avatar {
+        width: 56px;
+        height: 56px;
+        font-size: 1.8rem;
+      }
+
+      .modal-title {
+        font-size: 1.1rem;
+      }
+
+      .btn-contact,
+      .btn-detail {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+    }
 
   </style>
 </head>
